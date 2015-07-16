@@ -7,68 +7,81 @@ using System.Threading.Tasks;
 
    public class Character
     {
-        Random r = new Random();
 
-        int rng(int min, int max)
-        {
-            int number = r.Next(min, max);
-            return number;
-        }
+       //random number used for rng
+       Random r = new Random();
 
-        int maxHealth;
+
+       //the character's ID number, this can be 1-10
+       public int characterID;
+       public int turnPriority;
+
+       //Health variables
+       int maxHealth;
        public int HP;
+
+       // Level Variables
        public int level= 0;
        public int XP = 0;
-        //base health for each class
-       int[] basehealth = new int[4] { 500, 400, 250, 300 };
+
+        //base health for each class, not growth. used for balance purposes.
+       int[] basehealth = new int[4] { 500, 250, 200, 250 };
 
         //1)Paladin   2)Warrior  3)Rogue  4) Mage
         //add additional class by increasing array sizes, might put these into their own class later and make a list
         //stats used when leveling up, these are affected by character job, 
-        int[] strgrowth= new int[4]{10,13,5,3};
-        int[] stamgrowth = new int[4]{15,10,7,8};
-        int[] dexgrowth = new int[4]{5,9,15,6};
-        int[] intelgrowth = new int[4]{5,1,6,17};
+        int[] strgrowth= new int[4]   {5,14,5,1};
+        int[] stamgrowth = new int[4] {22,9,5,8};
+        int[] dexgrowth = new int[4]  {6,9,15,6};
+        int[] intelgrowth = new int[4]{5,2,6,17};
 
-        //base values for critical strike, armour(damage reduction) and block, these are then altered slightly based character level and on dexterity, stamina and srength stats repsectively
-        int[] critbase = new int[4] {1,4,20,10};
-        int[] blockbase = new int[4] { 20, 7, 2, 1 };
-        int[] armourbase = new int[4] { 20, 20, 5, 0 };
+        //base values for critical strike, armour(damage reduction) and block, these are then altered slightly based on character level and on dexterity/intellect, stamina/strength and srength/dexterity stats repsectively
+        int[] critbase = new int[4] {1,5,40,10};
+        int[] blockbase = new int[4] { 17, 2, 2, 1 };
+        int[] armourbase = new int[4] { 20, 7, 5, 0 };
         
         //character stats
-        int str = 0;
-        int stam = 0;
-        int dex = 0;
-        int intel = 0;
+       public int str = 0;
+       public int stam = 0;
+       public int dex = 0;
+       public int intel = 0;
 
-        //
-        int critchance;
-        int blockchance;
-        int armour;
-        
+        // combat stats, critchance gives a chance to do 3x damage, blackchance gives the chance to block all damage, armour reduces damage taken by a percent
+       public int critchance;
+       public  int blockchance;
+       public  int armour;
+         
         
        public int Job;
        public string characterName;
        public string teamName;
-       public string[] jobNames = new string[4] { "PALADIN", "WARRIOR", "ROGUE", "MAGE" };
+       public string[] jobNames = new string[4] { "CYBER TANK", "MECH WARRIOR", "WARP ROGUE", "TECH MAGE" };
 
+       //combat variables to determine whether this character is dead
+       public bool isDead;
 
-
-        //combat variables, used for whether their in a  defensive postion and the player who's defending them, defensive stance lasts until this character's next turn
+        //combat variables, used for whether their in a  defensive postion or wheather another player is defending them
+       //defensive stance lasts until this character's next turn
        public bool defending;
        public bool defended;
        public int defender;
 
 
+       //random number generator
+       int rng(int min, int max)
+       {
+           int number = r.Next(min, max);
+           return number;
+       }
 
-
-
-
+       /// <summary>
+       /// print character Stats, shows if they're being defended
+       /// </summary>
        public void PrintStats()
        {
            Console.WriteLine(teamName);
            Console.WriteLine("----------------------------");
-           Console.WriteLine("    "+characterName);
+           Console.WriteLine("ID# {0}   {1}",characterID,characterName);
            Console.WriteLine("----------------------------");
            Console.WriteLine("      LVL {0} {1}     ",level,jobNames[Job]);
            Console.WriteLine("----------------------------");
@@ -137,9 +150,9 @@ using System.Threading.Tasks;
                 intel += intelgrowth[Job] + (rng(0, intelgrowth[Job]));
 
                 // alter block and crit chance
-                critchance = critbase[Job] + (dex / (2 * level));
-                blockchance = blockbase[Job] + (str / (2 * level));
-                armour = armourbase[Job] + (stam / (2 * level));
+                critchance = critbase[Job] + (dex / (3 * level)) + (intel / (3 * level));
+                blockchance = blockbase[Job] + (str / (3 * level))+ (dex / (3 * level));
+                armour = armourbase[Job] + (stam / (3 * level)) + (str / (3 * level));
                 newLevels--;
             }
             // restore and alter health based on satmina

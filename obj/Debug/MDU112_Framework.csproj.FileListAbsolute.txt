@@ -4,3 +4,9 @@ D:\MDU112\VisualStudioFramework\bin\Debug\MDU112_Framework.pdb
 D:\MDU112\VisualStudioFramework\obj\Debug\MDU112_Framework.csprojResolveAssemblyReference.cache
 D:\MDU112\VisualStudioFramework\obj\Debug\MDU112_Framework.exe
 D:\MDU112\VisualStudioFramework\obj\Debug\MDU112_Framework.pdb
+D:\MDU112\MDU112.2\MDU112.2\obj\Debug\MDU112_Framework.exe
+D:\MDU112\MDU112.2\MDU112.2\obj\Debug\MDU112_Framework.pdb
+D:\MDU112\MDU112.2\MDU112.2\bin\Debug\MDU112_Framework.exe.config
+D:\MDU112\MDU112.2\MDU112.2\bin\Debug\MDU112_Framework.exe
+D:\MDU112\MDU112.2\MDU112.2\bin\Debug\MDU112_Framework.pdb
+D:\MDU112\MDU112.2\MDU112.2\obj\Debug\MDU112_Framework.csprojResolveAssemblyReference.cache

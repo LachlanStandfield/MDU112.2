@@ -6,34 +6,134 @@ using System.Threading.Tasks;
 
 
     class Combat
+
     {
+        Random r = new Random();
+        //ten possible turns, 11 is placed in the free spaces to prevent one of the of player IDs being used
+        int[] turns = new int[20] { 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11 };
+
+
+        int turnOrderCount;
+        int specialEyes = 0;
+        ///<summary>
+        ///random number generator
+        ///</summary>
+
+        int rng(int min, int max)
+        {
+            int number = r.Next(min, max);
+            return number;
+        }
+
         /// <summary>
         /// Information printed between each turn,
         /// Shows Turn Order >>Horizontally>> with character 
         /// Names and hp as well as whether they're being defended by another character
         /// </summary>
         /// shown as     |DEF| JOHN D 150/150            |DEF| PLAYER2 200/400
-        ///              >>     MAX C 30/100  >>            PLAYER1 40/200   >>           |DEF|PLAYER2 200/400   >>  |DEF| JOHN D 150/150          
+        ///              >>     MAX C 30/100  >>            PLAYER1 40/200   >>           |DEF|PLAYER2 200/400   >>  |DEF| JOHN D 150/150  
+      
         void battleInfo()
         {
 
         }
 
 
+
+
+
+
+
         /// <summary>
         /// determines player order according to a random number 
         /// which is influenced by the dex stat of each character
         /// </summary>
-
         public void turnOrder()
         {
+            //Console.WriteLine((Program.numberOfPlayers-1)*2+" turns");
+            //reset the turn order
+  
+           while (specialEyes < (Program.numberOfPlayers*2)){
+
+               bool valid = false;
+
+               while (valid == false)
+               {
+
+                       turnOrderCount = specialEyes;
+                       turns[specialEyes] = rng(1, Convert.ToInt32(Program.numberOfPlayers*2));
+                       //Console.WriteLine(turns[specialEyes]);
+                       valid = checkAgainstOthers(turns[specialEyes]);
+
+               }
+              // Console.WriteLine("I've left the loop");
+               specialEyes++;
+           }
+           for (int counter = 0; counter < (Program.numberOfPlayers*2); counter++)
+           {
+               Console.Write(" " + turns[counter]);
+           }
 
         }
 
+
         /// <summary>
-        /// main combat logic, team and player specifies who's fighting at 
-        /// the time, if they're ai then the ai target choice and move choice plays
+        /// checks turn id value against other turns to make sure there are no duplicates
         /// </summary>
+
+        bool checkAgainstOthers(int toCheck)
+        {
+            bool valid = true;
+            bool firstTurn = false;
+            int i = 0;
+
+            if (turnOrderCount == 0)
+            {
+                //Console.WriteLine("This is turn 0");
+                firstTurn = true;
+                valid = true;
+            }
+            if (firstTurn == false)
+            {
+                while (i < turnOrderCount)
+                {
+                    if (turns[i] == toCheck)
+                    {
+                        //Console.WriteLine("This is a duplicate of Turn " + i);
+                        //Console.ReadKey();
+                        valid = false;
+                    }
+                    i++;
+                }
+            }
+            return valid;
+        }
+
+
+
+
+        /// <summary>
+        /// main combat sequence, team and player specifies who's fighting at 
+        /// the time, if they're ai then the it itiliases thr ai commands otherwise the player chooses their move
+        /// </summary>
+        ///             
+        ///choose action
+        ///1.Attack  2.Defend  3.Heal  4.Hold  5.Scan
+        ///
+        ///Attack Who?
+        ///for each character display name and health with number to select them based on their ID
+        ///4.Jim Baddy 100/300       5.John Baddy 75/150           6.Harold Baddy 100/250
+        ///
+        /// Defend Who?
+        /// Displays characters able to be defended, this includes themself
+        /// 1. Self 200/200  2. John Hero 200/200 3. Jason Hero 153/200
+        /// if you defend smomone else then the defend other method is called with Jim as the acitve defender
+        /// 
+        ///Scan who?
+        ///for each character display name and health with number to select them based on their ID
+        ///1. John Hero 200/200 2.Jim Hero 200/200 3. Jason Hero 153/200 4.Jim Baddy 100/300 5.John Baddy 75/150 6.Harold Baddy 100/250
+        ///if you scan then you print their stats, including if they're being defended
+
         public void combatphase(int team, int player)
         {
 
@@ -41,20 +141,11 @@ using System.Threading.Tasks;
 
 
 
-
-
-
-
-
-
-
-
-
         /// <summary>
         /// player chooses their target and their move
         /// if the target is an ally they'll be promted to heal or defend
         /// if it's an enemy then they can attack
-        /// if one team member is defending another then choosing 
+        /// if one team member is d*/*+*-*efending another then choosing 
         /// the member the're defending forces them to attack the defender
         /// </summary>
         void playerCombat()
