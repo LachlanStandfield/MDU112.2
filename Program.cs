@@ -256,9 +256,39 @@ class Program
 
     public void Run()
     {
-        numberOfPlayers = 10;
+        numberOfPlayers = 4;
+        team1Name = "Team Testers";
+        Team1.Add(new Character() {characterID = 1,characterName = "Test Tank", Job =0, XP = 300,teamName = team1Name});
+        Team1.Add(new Character() { characterID = 2, characterName = "Test Warrior", Job = 1, XP = 300, teamName = team1Name });
+        Team1.Add(new Character() { characterID = 3, characterName = "Test Rogue", Job = 2, XP = 300, teamName = team1Name });
+        Team1.Add(new Character() { characterID = 4, characterName = "Test Mage", Job = 3, XP = 300, teamName = team1Name });
+        Team1[0].Levelup();
+        Team1[1].Levelup();
+        Team1[2].Levelup();
+        Team1[3].Levelup();
+        Team1[0].PrintStats();
+        Team1[1].PrintStats();
+        Team1[2].PrintStats();
+        Team1[3].PrintStats();
+        team2Name = "Bad Dudes";
+        Team2.Add(new Character() { characterID = 5, characterName = "Bad Tank", Job = 0, XP = 300, teamName = team2Name });
+        Team2.Add(new Character() { characterID = 6, characterName = "Bad Warrior", Job = 1, XP = 300, teamName = team2Name });
+        Team2.Add(new Character() { characterID = 7, characterName = "Bad Rogue", Job = 2, XP = 300, teamName = team2Name });
+        Team2.Add(new Character() { characterID = 8, characterName = "Bad Mage", Job = 3, XP = 300, teamName = team2Name });
+        Team2[0].Levelup();
+        Team2[1].Levelup();
+        Team2[2].Levelup();
+        Team2[3].Levelup();
+        Team2[0].PrintStats();
+        Team2[1].PrintStats();
+        Team2[2].PrintStats();
+        Team2[3].PrintStats();
         Combat Combatphase = new Combat();
         Combatphase.turnOrder();
+        Combatphase.battleInfo();
+        Console.ReadKey();
+        Combatphase.testRemove();
+        Combatphase.battleInfo();
     }
 
 }

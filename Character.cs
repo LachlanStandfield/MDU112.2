@@ -74,6 +74,13 @@ using System.Threading.Tasks;
            return number;
        }
 
+
+       public string statBrief()
+       {
+           return characterName+" "+HP+"/"+maxHealth+" - "+teamName;
+       }
+
+
        /// <summary>
        /// print character Stats, shows if they're being defended
        /// </summary>
@@ -119,6 +126,8 @@ using System.Threading.Tasks;
        {
 
        }
+
+
 
 
 

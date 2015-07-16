@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
     {
         Random r = new Random();
-        //ten possible turns, 11 is placed in the free spaces to prevent one of the of player IDs being used
-        int[] turns = new int[20] { 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11 };
+        //ten possible turns, 33 is placed in the free spaces to prevent one of the of player IDs being used
+        int[] turns = new int[20] { 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33 };
 
 
         int turnOrderCount;
@@ -32,9 +32,42 @@ using System.Threading.Tasks;
         /// </summary>
         /// shown as     |DEF| JOHN D 150/150            |DEF| PLAYER2 200/400
         ///              >>     MAX C 30/100  >>            PLAYER1 40/200   >>           |DEF|PLAYER2 200/400   >>  |DEF| JOHN D 150/150  
-      
-        void battleInfo()
+
+
+        public void testRemove()
         {
+            turns[0] = 33;
+            turns[1] = 33;
+
+        }
+
+
+
+        public void battleInfo()
+        {
+            Console.WriteLine("---------------------------");
+            Console.WriteLine("       BATTLE INFO");
+            Console.WriteLine("---------------------------");
+            Console.WriteLine("    v v TURN ORDER v v");
+            for (int i = 0; i < (Program.numberOfPlayers*2); i++)
+            {
+                if (turns[i] != 33)
+                {
+
+                    if (turns[i] <= (Program.numberOfPlayers - 1))
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine(Program.Team1[turns[i]].statBrief());
+                    }
+
+                    else
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine(Program.Team2[(turns[i] - Convert.ToInt32(Program.numberOfPlayers))].statBrief());
+
+                    }
+                }
+            }
 
         }
 
@@ -50,7 +83,7 @@ using System.Threading.Tasks;
         /// </summary>
         public void turnOrder()
         {
-            Console.WriteLine((Program.numberOfPlayers-1)*2+" turns");
+            //Console.WriteLine((Program.numberOfPlayers-1)*2+" turns");
            //reset the turn order
   
            while (specialEyes < (Program.numberOfPlayers*2)){
@@ -61,22 +94,22 @@ using System.Threading.Tasks;
                {
 
                        turnOrderCount = specialEyes;
-                       turns[specialEyes] = rng(0, Convert.ToInt32(Program.numberOfPlayers*2+1));
-                       if (turns[specialEyes] == 0)
-                       {
-                           turns[specialEyes] = 1;
-                       }
-                       Console.WriteLine(turns[specialEyes]);
+                       turns[specialEyes] = rng(0, Convert.ToInt32(Program.numberOfPlayers*2));
+                       //if (turns[specialEyes] == 0)
+                       //{
+                       //    turns[specialEyes] = 1;
+                      // }
+                       //Console.WriteLine(turns[specialEyes]);
                        valid = checkAgainstOthers(turns[specialEyes]);
 
                }
-               Console.WriteLine("Turn "+specialEyes+" is "+turns[specialEyes]+". I've left the loop");
+               //Console.WriteLine("Turn "+specialEyes+" is "+turns[specialEyes]+". I've left the loop");
                specialEyes++;
            }
-           for (int counter = 0; counter < (Program.numberOfPlayers*2); counter++)
-           {
-               Console.Write(" " + turns[counter]);
-           }
+          // for (int counter = 0; counter < (Program.numberOfPlayers*2); counter++)
+          // {
+           //    Console.Write(" " + turns[counter]);
+          // }
 
         }
 
@@ -93,7 +126,7 @@ using System.Threading.Tasks;
 
             if (turnOrderCount == 0)
             {
-                Console.WriteLine("This is turn 0");
+                //Console.WriteLine("This is turn 0");
                 firstTurn = true;
                 valid = true;
             }
@@ -103,7 +136,7 @@ using System.Threading.Tasks;
                 {
                     if (turns[i] == toCheck)
                     {
-                        Console.WriteLine("This is a duplicate of Turn " + i);
+                        //Console.WriteLine("This is a duplicate of Turn " + i);
                         //Console.ReadKey();
                         valid = false;
                     }
