@@ -50,8 +50,8 @@ using System.Threading.Tasks;
         /// </summary>
         public void turnOrder()
         {
-            //Console.WriteLine((Program.numberOfPlayers-1)*2+" turns");
-            //reset the turn order
+            Console.WriteLine((Program.numberOfPlayers-1)*2+" turns");
+           //reset the turn order
   
            while (specialEyes < (Program.numberOfPlayers*2)){
 
@@ -61,12 +61,16 @@ using System.Threading.Tasks;
                {
 
                        turnOrderCount = specialEyes;
-                       turns[specialEyes] = rng(1, Convert.ToInt32(Program.numberOfPlayers*2));
-                       //Console.WriteLine(turns[specialEyes]);
+                       turns[specialEyes] = rng(0, Convert.ToInt32(Program.numberOfPlayers*2+1));
+                       if (turns[specialEyes] == 0)
+                       {
+                           turns[specialEyes] = 1;
+                       }
+                       Console.WriteLine(turns[specialEyes]);
                        valid = checkAgainstOthers(turns[specialEyes]);
 
                }
-              // Console.WriteLine("I've left the loop");
+               Console.WriteLine("Turn "+specialEyes+" is "+turns[specialEyes]+". I've left the loop");
                specialEyes++;
            }
            for (int counter = 0; counter < (Program.numberOfPlayers*2); counter++)
@@ -89,7 +93,7 @@ using System.Threading.Tasks;
 
             if (turnOrderCount == 0)
             {
-                //Console.WriteLine("This is turn 0");
+                Console.WriteLine("This is turn 0");
                 firstTurn = true;
                 valid = true;
             }
@@ -99,7 +103,7 @@ using System.Threading.Tasks;
                 {
                     if (turns[i] == toCheck)
                     {
-                        //Console.WriteLine("This is a duplicate of Turn " + i);
+                        Console.WriteLine("This is a duplicate of Turn " + i);
                         //Console.ReadKey();
                         valid = false;
                     }

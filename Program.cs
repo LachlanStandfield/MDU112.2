@@ -256,7 +256,7 @@ class Program
 
     public void Run()
     {
-        numberOfPlayers = 2;
+        numberOfPlayers = 10;
         Combat Combatphase = new Combat();
         Combatphase.turnOrder();
     }
