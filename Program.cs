@@ -76,15 +76,15 @@ class Program
     /// </summary>
     void createEnemy()
     {
-        string[] randomName = new string[4] { "Dick", "Dickinson", "Dickus", "John" };
-        string[] randomTitle = new string[4] { "The Killer", "The Dick", "The Reckless", "The Grumpy" };
-        string[] randomTeamName = new string[12] { "Killer", "Sandy", "Salty", "Sexual", "Angry", "Silent", "Men", "Killers", "Rascals", "Gentlemen", "Freaks", "Boys" };
+        string[] randomName = new string[7] { "DICK", "DIRTY", "CASH", "JOHN", "JONATHAN","DIO","SMOKEY" };
+        string[] randomTitle = new string[7] { "DOE", "BADDY", "DAN", "DICK","JOESTAR","BRANDO","MONEY" };
+        string[] randomTeamName = new string[12] { "KILLER", "SANDY", "SALTY", "SEXUAL", "ANGRY", "SILENT", "MEN", "KILLERS", "RASCALS", "GENTLEMEN", "FREAKS", "BOYS" };
 
-        team2Name = "The " + randomTeamName[rng(0, randomTeamName.Length / 2)] + " " + randomTeamName[rng(randomTeamName.Length / 2, randomTeamName.Length)];
+        team2Name = "[THE " + randomTeamName[rng(0, randomTeamName.Length / 2)] + " " + randomTeamName[rng(randomTeamName.Length/2, randomTeamName.Length)]+"]";
         for (int count = 0; count < numberOfPlayers; count++)
         {
             //create random character
-            Team2.Add(new Character() { characterName = (randomName[rng(0, (randomName.Length))] + " " + randomTitle[rng(0, (randomTitle.Length))]), Job = rng(0, 4) });
+            Team2.Add(new Character() { characterName = "["+(randomName[rng(0, (randomName.Length))] + " " + randomTitle[rng(0, (randomTitle.Length))]+"]"), Job = rng(0, 4) });
             Team2[count].teamName = team2Name;
             Team2[count].characterID = assignID;
             assignID++;
@@ -124,7 +124,7 @@ class Program
         {
             Team1.Add(new Character());
             valid = false;
-            Team1[counter].teamName = team1Name;
+            Team1[counter].teamName = "["+team1Name+"]";
             Team1[counter].characterID = assignID;
             assignID++;
 
@@ -260,25 +260,44 @@ class Program
 
     public void Run()
     {
+        Console.WriteLine("TEST GAME");
+        pressToContinue();
         testMen();
         createEnemy();
         Combat Combatphase = new Combat();
+        Console.WriteLine(" TURN ORDER TEST");
         Combatphase.turnOrder();
         Combatphase.battleInfo();
         Console.ReadKey();
+        Console.WriteLine();
         Combatphase.testRemove();
         Combatphase.battleInfo();
+        Console.ReadKey();
+        Console.WriteLine();
+        Console.Clear();
+        Console.WriteLine(" --BATTLE TEST--");
+        Console.WriteLine();
+        //combat tests
+        bool test = true;
+        for (int i = 0; i < 50; i++)
+        {
+            Combatphase.dealdamage(test, rng(0, Convert.ToInt32(numberOfPlayers)), rng(0, Convert.ToInt32(numberOfPlayers)));
+            Combatphase.heal(test, rng(0, Convert.ToInt32(numberOfPlayers)), rng(0, Convert.ToInt32(numberOfPlayers)));
+            test = !test;
+            
+        }
+
     }
 
     void testMen()
     {
         int testXP = 100;
         numberOfPlayers = 4;
-        team1Name = "Team Testers";
-        Team1.Add(new Character() { characterID = 1, characterName = "Test Tank", Job = 0, XP = testXP, teamName = team1Name });
-        Team1.Add(new Character() { characterID = 2, characterName = "Test Warrior", Job = 1, XP = testXP, teamName = team1Name });
-        Team1.Add(new Character() { characterID = 3, characterName = "Test Rogue", Job = 2, XP = testXP, teamName = team1Name });
-        Team1.Add(new Character() { characterID = 4, characterName = "Test Mage", Job = 3, XP = testXP, teamName = team1Name });
+        team1Name = "[TEAM TESTER]";
+        Team1.Add(new Character() { characterID = 1, characterName = "[TEST TANK]", Job = 0, XP = testXP, teamName = team1Name });
+        Team1.Add(new Character() { characterID = 2, characterName = "[TEST WARRIOR]", Job = 1, XP = testXP, teamName = team1Name });
+        Team1.Add(new Character() { characterID = 3, characterName = "[TEST ROGUE]", Job = 2, XP = testXP, teamName = team1Name });
+        Team1.Add(new Character() { characterID = 4, characterName = "[TEST MAGE]", Job = 3, XP = testXP, teamName = team1Name });
         Team1[0].Levelup();
         Team1[1].Levelup();
         Team1[2].Levelup();
@@ -287,6 +306,14 @@ class Program
         Team1[1].PrintStats();
         Team1[2].PrintStats();
         Team1[3].PrintStats();
+    }
+
+    static public void pressToContinue()
+    {
+        Console.WriteLine();
+        Console.WriteLine("[PRESS ANY KEY TO CONTINUE]");
+        Console.WriteLine();
+        Console.ReadKey();
     }
 
 }

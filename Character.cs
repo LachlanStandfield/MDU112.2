@@ -55,15 +55,15 @@ using System.Threading.Tasks;
        public int Job;
        public string characterName;
        public string teamName;
-       public string[] jobNames = new string[4] { "CYBER TANK", "MECH WARRIOR", "WARP ROGUE", "TECH MAGE" };
+       public string[] jobNames = new string[4] { "[CYBER TANK]", "[MECH WARRIOR]", "[WARP ROGUE]", "[TECH MAGE]" };
 
        //combat variables to determine whether this character is dead
-       public bool isDead;
+       public bool isDead = false;
 
         //combat variables, used for whether their in a  defensive postion or wheather another player is defending them
        //defensive stance lasts until this character's next turn
-       public bool defending;
-       public bool defended;
+       public bool defending = false;
+       public bool defended = false;
        public int defender;
 
 
@@ -77,7 +77,7 @@ using System.Threading.Tasks;
 
        public string statBrief()
        {
-           return characterName + " " + HP + "/" + maxHealth + " - " + teamName;
+           return jobNames[Job] + " " + characterName + " " + HP + "/" + maxHealth;
        }
 
 
@@ -86,13 +86,20 @@ using System.Threading.Tasks;
        /// </summary>
        public void PrintStats()
        {
-           Console.WriteLine(teamName);
+           Console.WriteLine("    "+teamName);
            Console.WriteLine("----------------------------");
            Console.WriteLine("ID# {0}   {1}",characterID,characterName);
            Console.WriteLine("----------------------------");
            Console.WriteLine("      LVL {0} {1}     ",level,jobNames[Job]);
            Console.WriteLine("----------------------------");
-           Console.WriteLine("      HP {0}/{1}",HP,maxHealth);
+           if (isDead == false)
+           {
+           Console.WriteLine("      HP {0}/{1}", HP, maxHealth);
+           }
+           else
+           {
+           Console.WriteLine("          --DEAD--");
+           }
            Console.WriteLine("----------------------------");
            Console.WriteLine("       STRENGTH " + str);
            Console.WriteLine("        STAMINA " + stam);
@@ -107,13 +114,15 @@ using System.Threading.Tasks;
            if (defended == true)
            {
                Console.WriteLine();
-               Console.WriteLine("DEFENDED BY...");
-               Program.Team1[defender].PrintStats();
+               Console.WriteLine("DEFENDED BY ");
+               Console.Write(Program.Team1[defender].statBrief());
            }
 
 
 
        }
+
+
        /// <summary>
        /// Receive healing, if they're a tank then they receive less
        /// </summary>
@@ -124,7 +133,15 @@ using System.Threading.Tasks;
                healAmount /= 2;
            }
            HP += healAmount;
+           if (HP > maxHealth)
+           {
+               HP = maxHealth;
+           }
+           Console.WriteLine("{0} RECEIVES {1} HEALTH",characterName,healAmount);
+           System.Threading.Thread.Sleep(500);
        }
+
+
        /// <summary>
        /// calculates healing based on a random value based on their intellect plus a base heal of their intellectx3
        /// Tanks can't heal well, otherwise they'd be overpowered
@@ -142,7 +159,7 @@ using System.Threading.Tasks;
        }
 
        /// <summary>
-       /// calculate base damage. seperates mages from other classes, as they use their int stat to deal damage
+       /// calculate base damage by multiplying strength by 4. seperates mages from other classes, as they use their int stat to deal damage
        /// </summary>
        /// <returns></returns>
        public int characterDamage()
@@ -150,7 +167,7 @@ using System.Threading.Tasks;
            int damage;
            if (Job == 3)
            {
-               damage = intel * 4;
+               damage = intel * 2;
            }
            else
            {
@@ -160,12 +177,23 @@ using System.Threading.Tasks;
        }
 
         /// <summary>
-        /// recieve damage, this is kind of pointlessly complex right now but I might find a use for it.
+        /// recieve damage, if their health is 0 then they're decalred dead
         /// </summary>
         /// <param name="damage"></param>
        public void takedamage(int damage)
        {
            HP -= damage;
+           Console.WriteLine("{0} RECEIVES {1} DAMAGE!", characterName, damage);
+           Console.WriteLine();
+           if (HP <= 0)
+           {
+               HP = 0;
+               System.Threading.Thread.Sleep(500);
+               Console.Write(characterName + " HAS BEEN DESTROYED!");
+               isDead = true;
+               Program.pressToContinue();
+               Console.WriteLine();
+           }
        }
 
        public bool dodge()
@@ -189,10 +217,13 @@ using System.Threading.Tasks;
        {
            bool block = false;
            int hitchance = rng(1, 100);
-           int blockchance = rng(1, 10) + (dex / level);
-           if (blockchance > 75)
+           if (defending == true) 
            {
-               blockchance = 75;
+               blockchance *= 2;
+           }
+           if (blockchance > 90)
+           {
+               blockchance = 90;
            }
            if (blockchance > hitchance)
            {

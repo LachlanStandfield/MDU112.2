@@ -72,7 +72,6 @@ using System.Threading.Tasks;
                     }
                 }
             }
-
         }
 
 
@@ -156,7 +155,7 @@ using System.Threading.Tasks;
         /// if you defend smomone else then the defend other method is called with Jim as the acitve defender
         /// 
         /// Heal Who?
-        /// displays allys with less than full health
+        /// displays allies with less than full health
         /// 1. Self 199/200   3. Jason Hero 153/200*
         ///Scan who?
         ///for each character display name and health with number to select them based on their ID
@@ -174,7 +173,7 @@ using System.Threading.Tasks;
         /// player chooses their target and their move
         /// if the target is an ally they'll be promted to heal or defend
         /// if it's an enemy then they can attack
-        /// if one team member is d*/*+*-*efending another then choosing 
+        /// if one team member is defending another then choosing 
         /// the member the're defending forces them to attack the defender
         /// </summary>
         void playerCombat()
@@ -204,31 +203,47 @@ using System.Threading.Tasks;
         /// </summary>
         public void dealdamage(bool player,int attacker,int target)
         {
-            int damage=0;
+            int damage;
+            Console.WriteLine();
             if (player == true)
             {
+                Console.WriteLine("{0} ATTACKS {1}...", Program.Team1[attacker].statBrief(), Program.Team2[target].statBrief());
+                Console.WriteLine();
+                System.Threading.Thread.Sleep(500);
                 //checks if the target dodges and changes damage to 0
                 damage = Program.Team1[attacker].characterDamage();
                 if (Program.Team1[attacker].crit() == true)
                 {
-                    Console.WriteLine("{0} ATTACKS FOR [CRITICAL DAMAGE]*!", Program.Team1[attacker].characterName);
+                    Console.WriteLine("A CRITICAL HIT!");
+                    Console.WriteLine();
+                    System.Threading.Thread.Sleep(500);
                     damage = damage * 5;
                 }
                 if (Program.Team2[target].dodge() == true){
-                    Console.WriteLine("{0} dodges the attack!",Program.Team2[target].characterName);
+                    Console.WriteLine("{0} DODGES IT!",Program.Team2[target].characterName);
+                    Console.WriteLine();
+                    System.Threading.Thread.Sleep(500);
                     damage = 0;
                 }
                     //checks if the target block the attack and changes damage to 0
                 else if (Program.Team2[target].block() == true)
                 {
-                    Console.WriteLine("{0} blocks the attack!",Program.Team2[target].characterName);
+                    Console.WriteLine("{0} BLOCKS IT!",Program.Team2[target].characterName);
+                    Console.WriteLine();
+                    System.Threading.Thread.Sleep(500);
                     damage = 0;
                 }
                 else
                 {
                     //check the attacker ins't a mage, if they aren't then apply armour
                     if (Program.Team1[attacker].Job != 3){
-                        damage = damage*(Program.Team2[target].armour/100);
+                        decimal armour = 1 - Convert.ToDecimal(Program.Team2[target].armour) / 100;
+                        //if they're defending then the armour value is doubled
+                        if (Program.Team2[target].defending == true)
+                        {
+                            armour -= Convert.ToDecimal(Program.Team2[target].armour) / 100;
+                        }
+                        damage = Convert.ToInt32(Convert.ToDecimal(damage)*armour);
                     }
                 }
             }
@@ -236,27 +251,42 @@ using System.Threading.Tasks;
                 //duplicate code not sure how to to this atm. might have to place the two lists into an array.
             else
             {
+                Console.WriteLine("{0} ATTACKS {1}", Program.Team2[attacker].statBrief(), Program.Team1[target].statBrief());
+                Console.WriteLine();
+                System.Threading.Thread.Sleep(500);
                 damage = Program.Team2[attacker].characterDamage();
                 if (Program.Team1[attacker].crit() == true)
                 {
-                    Console.WriteLine("{0} ATTACKS FOR [CRITICAL DAMAGE]*!", Program.Team2[attacker].characterName);
+                    Console.WriteLine("A CRITICAL HIT");
+                    Console.WriteLine();
+                    System.Threading.Thread.Sleep(500);
                     damage = damage * 5;
                 }
                 if (Program.Team1[target].dodge() == true)
                 {
-                    Console.WriteLine("{0} dodges the attack!", Program.Team1[target].characterName);
+                    Console.WriteLine("{0} DODGES IT!", Program.Team1[target].characterName);
+                    Console.WriteLine();
+                    System.Threading.Thread.Sleep(500);
                     damage = 0;
                 }
                 else if (Program.Team1[target].block() == true)
                 {
-                    Console.WriteLine("{0} blocks the attack!", Program.Team1[target].characterName);
+                    Console.WriteLine("{0} BLOCKS IT!", Program.Team1[target].characterName);
+                    Console.WriteLine();
+                    System.Threading.Thread.Sleep(500);
                     damage = 0;
                 }
                 else
                 {
                     if (Program.Team2[attacker].Job != 3)
                     {
-                        damage = damage * (Program.Team1[target].armour / 100);
+                        decimal armour = 1 - Convert.ToDecimal(Program.Team1[target].armour) / 100;
+                        //if they're defending then the armour value is doubled
+                        if (Program.Team2[target].defending == true)
+                        {
+                            armour -= Convert.ToDecimal(Program.Team1[target].armour) / 100;
+                        }
+                        damage = Convert.ToInt32(Convert.ToDecimal(damage) * armour);
                     }
                 }
             }
@@ -270,6 +300,7 @@ using System.Threading.Tasks;
             {
                 Program.Team1[target].takedamage(damage);
             }
+            System.Threading.Thread.Sleep(500);
         }
 
 
@@ -278,15 +309,21 @@ using System.Threading.Tasks;
         /// <summary>
         /// apply healing to target
         /// </summary>
-        void heal(bool player,int target, int healer)
+        public void heal(bool player,int target, int healer)
         {
             if (player == true)
             {
+                Console.WriteLine("{0} HEALS {1}", Program.Team1[healer].statBrief(), Program.Team1[target].statBrief());
+                Console.WriteLine();
+                System.Threading.Thread.Sleep(500);
                 Program.Team1[target].receiveHeal(Program.Team1[healer].characterHeal());
             }
                 //duplicate code will try to FIX THIS
             else
             {
+                Console.WriteLine("{0} HEALS {1}", Program.Team2[healer].statBrief(), Program.Team2[target].statBrief());
+                Console.WriteLine();
+                System.Threading.Thread.Sleep(500);
                 Program.Team2[target].receiveHeal(Program.Team2[healer].characterHeal());
             }
         }
