@@ -30,14 +30,14 @@ using System.Threading.Tasks;
         //1)Paladin   2)Warrior  3)Rogue  4) Mage
         //add additional class by increasing array sizes, might put these into their own class later and make a list
         //stats used when leveling up, these are affected by character job, 
-        int[] strgrowth= new int[4]   {5,14,5,1};
+        int[] strgrowth= new int[4]   {4,16,6,1};
         int[] stamgrowth = new int[4] {22,9,5,8};
         int[] dexgrowth = new int[4]  {6,9,15,6};
         int[] intelgrowth = new int[4]{5,2,6,17};
 
         //base values for critical strike, armour(damage reduction) and block, these are then altered slightly based on character level and on dexterity/intellect, stamina/strength and srength/dexterity stats repsectively
         int[] critbase = new int[4] {1,5,40,10};
-        int[] blockbase = new int[4] { 17, 2, 2, 1 };
+        int[] blockbase = new int[4] { 22, 2, 2, 1 };
         int[] armourbase = new int[4] { 20, 7, 5, 0 };
         
         //character stats
@@ -114,9 +114,35 @@ using System.Threading.Tasks;
 
 
        }
+       /// <summary>
+       /// Receive healing, if they're a tank then they receive less
+       /// </summary>
+       /// <param name="healAmount"></param>
+       public void receiveHeal(int healAmount)
+       {
+           if (Job == 2){
+               healAmount /= 2;
+           }
+           HP += healAmount;
+       }
+       /// <summary>
+       /// calculates healing based on a random value based on their intellect plus a base heal of their intellectx3
+       /// Tanks can't heal well, otherwise they'd be overpowered
+       /// </summary>
+       /// <returns></returns>
+       public int characterHeal()
+       {
+           int heal;
+           heal = rng(1, intel) + (intel * 3);
+           if (Job == 0)
+           {
+               heal /= 2;
+           }
+           return heal;
+       }
 
        /// <summary>
-       /// seperates mages from other classes, as they use their int stat to deal damage
+       /// calculate base damage. seperates mages from other classes, as they use their int stat to deal damage
        /// </summary>
        /// <returns></returns>
        public int characterDamage()
@@ -134,7 +160,7 @@ using System.Threading.Tasks;
        }
 
         /// <summary>
-        /// 
+        /// recieve damage, this is kind of pointlessly complex right now but I might find a use for it.
         /// </summary>
         /// <param name="damage"></param>
        public void takedamage(int damage)
@@ -177,6 +203,20 @@ using System.Threading.Tasks;
            return block;
        }
 
+       public bool crit()
+       {
+           bool crit = false;
+
+           int hitchance = rng(1, 100);
+           if (critchance > hitchance)
+           {
+               crit = true;
+           }
+
+
+           return crit;
+       }
+
 
 
 
@@ -209,7 +249,7 @@ using System.Threading.Tasks;
                 intel += intelgrowth[Job] + (rng(0, intelgrowth[Job]));
 
                 // alter block and crit chance
-                critchance = critbase[Job] + (dex / (3 * level)) + (intel / (3 * level));
+                critchance = critbase[Job] + (dex / (2 * level) + (intel / (3* level)));
                 blockchance = blockbase[Job] + (str / (3 * level))+ (dex / (3 * level));
                 armour = armourbase[Job] + (stam / (3 * level)) + (str / (3 * level));
                 newLevels--;

@@ -155,6 +155,9 @@ using System.Threading.Tasks;
         /// 1. Self 200/200  2. John Hero 200/200 3. Jason Hero 153/200
         /// if you defend smomone else then the defend other method is called with Jim as the acitve defender
         /// 
+        /// Heal Who?
+        /// displays allys with less than full health
+        /// 1. Self 199/200   3. Jason Hero 153/200*
         ///Scan who?
         ///for each character display name and health with number to select them based on their ID
         ///1. John Hero 200/200 2.Jim Hero 200/200 3. Jason Hero 153/200 4.Jim Baddy 100/300 5.John Baddy 75/150 6.Harold Baddy 100/250
@@ -206,6 +209,11 @@ using System.Threading.Tasks;
             {
                 //checks if the target dodges and changes damage to 0
                 damage = Program.Team1[attacker].characterDamage();
+                if (Program.Team1[attacker].crit() == true)
+                {
+                    Console.WriteLine("{0} ATTACKS FOR [CRITICAL DAMAGE]*!", Program.Team1[attacker].characterName);
+                    damage = damage * 5;
+                }
                 if (Program.Team2[target].dodge() == true){
                     Console.WriteLine("{0} dodges the attack!",Program.Team2[target].characterName);
                     damage = 0;
@@ -229,6 +237,11 @@ using System.Threading.Tasks;
             else
             {
                 damage = Program.Team2[attacker].characterDamage();
+                if (Program.Team1[attacker].crit() == true)
+                {
+                    Console.WriteLine("{0} ATTACKS FOR [CRITICAL DAMAGE]*!", Program.Team2[attacker].characterName);
+                    damage = damage * 5;
+                }
                 if (Program.Team1[target].dodge() == true)
                 {
                     Console.WriteLine("{0} dodges the attack!", Program.Team1[target].characterName);
@@ -260,17 +273,23 @@ using System.Threading.Tasks;
         }
 
 
+
+
         /// <summary>
         /// apply healing to target
         /// </summary>
-        void heal()
+        void heal(bool player,int target, int healer)
         {
-
+            if (player == true)
+            {
+                Program.Team1[target].receiveHeal(Program.Team1[healer].characterHeal());
+            }
+                //duplicate code will try to FIX THIS
+            else
+            {
+                Program.Team2[target].receiveHeal(Program.Team2[healer].characterHeal());
+            }
         }
-
-
-
-
 
 
 
