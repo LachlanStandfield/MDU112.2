@@ -46,7 +46,7 @@ using System.Threading.Tasks;
        public int dex = 0;
        public int intel = 0;
 
-        // combat stats, critchance gives a chance to do 3x damage, blackchance gives the chance to block all damage, armour reduces damage taken by a percent
+        // combat stats, critchance gives a chance to do 5x damage, blackchance gives the chance to block all damage, armour reduces damage taken by a percent
        public int critchance;
        public  int blockchance;
        public  int armour;
@@ -77,7 +77,7 @@ using System.Threading.Tasks;
 
        public string statBrief()
        {
-           return characterName+" "+HP+"/"+maxHealth+" - "+teamName;
+           return characterName + " " + HP + "/" + maxHealth + " - " + teamName;
        }
 
 
@@ -115,16 +115,66 @@ using System.Threading.Tasks;
 
        }
 
-
-
+       /// <summary>
+       /// seperates mages from other classes, as they use their int stat to deal damage
+       /// </summary>
+       /// <returns></returns>
+       public int characterDamage()
+       {
+           int damage;
+           if (Job == 3)
+           {
+               damage = intel * 4;
+           }
+           else
+           {
+               damage = str * 4;
+           }
+           return damage;
+       }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="damage"></param>
-       void takedamage(int damage)
+       public void takedamage(int damage)
        {
+           HP -= damage;
+       }
 
+       public bool dodge()
+       {
+           bool dodge= false;
+           int hitchance = rng(1, 100);
+           int dodgechance = rng(1, 10) + (dex / level);
+           if (dodgechance > 75)
+           {
+               dodgechance = 75;
+           }
+           if (dodgechance > hitchance)
+           {
+               dodge = true;
+           }
+
+
+           return dodge;
+       }
+       public bool block()
+       {
+           bool block = false;
+           int hitchance = rng(1, 100);
+           int blockchance = rng(1, 10) + (dex / level);
+           if (blockchance > 75)
+           {
+               blockchance = 75;
+           }
+           if (blockchance > hitchance)
+           {
+               block = true;
+           }
+
+
+           return block;
        }
 
 

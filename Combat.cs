@@ -8,8 +8,13 @@ using System.Threading.Tasks;
     class Combat
 
     {
+        //used to print the combat info
+        int comabtlogTurnNumber;
+        List<string> combatLog = new List<string>();
+
+
         Random r = new Random();
-        //ten possible turns, 33 is placed in the free spaces to prevent one of the of player IDs being used
+        //twenty possible turns, 33 is placed in the free spaces to prevent one of the of player IDs being used
         int[] turns = new int[20] { 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33 };
 
 
@@ -18,7 +23,6 @@ using System.Threading.Tasks;
         ///<summary>
         ///random number generator
         ///</summary>
-
         int rng(int min, int max)
         {
             int number = r.Next(min, max);
@@ -83,9 +87,6 @@ using System.Threading.Tasks;
         /// </summary>
         public void turnOrder()
         {
-            //Console.WriteLine((Program.numberOfPlayers-1)*2+" turns");
-           //reset the turn order
-  
            while (specialEyes < (Program.numberOfPlayers*2)){
 
                bool valid = false;
@@ -95,21 +96,12 @@ using System.Threading.Tasks;
 
                        turnOrderCount = specialEyes;
                        turns[specialEyes] = rng(0, Convert.ToInt32(Program.numberOfPlayers*2));
-                       //if (turns[specialEyes] == 0)
-                       //{
-                       //    turns[specialEyes] = 1;
-                      // }
-                       //Console.WriteLine(turns[specialEyes]);
                        valid = checkAgainstOthers(turns[specialEyes]);
 
                }
-               //Console.WriteLine("Turn "+specialEyes+" is "+turns[specialEyes]+". I've left the loop");
                specialEyes++;
            }
-          // for (int counter = 0; counter < (Program.numberOfPlayers*2); counter++)
-          // {
-           //    Console.Write(" " + turns[counter]);
-          // }
+
 
         }
 
@@ -126,7 +118,6 @@ using System.Threading.Tasks;
 
             if (turnOrderCount == 0)
             {
-                //Console.WriteLine("This is turn 0");
                 firstTurn = true;
                 valid = true;
             }
@@ -136,8 +127,6 @@ using System.Threading.Tasks;
                 {
                     if (turns[i] == toCheck)
                     {
-                        //Console.WriteLine("This is a duplicate of Turn " + i);
-                        //Console.ReadKey();
                         valid = false;
                     }
                     i++;
@@ -204,13 +193,73 @@ using System.Threading.Tasks;
         {
 
         }
+
+
+
         /// <summary>
         /// apply damage to target, base damage value is found in the character class, checks against defender's defensive stats
         /// </summary>
-        void dealdamage(int attackerDamage, int defenderBlock, int defenderArmour, int defenderDodge)
+        public void dealdamage(bool player,int attacker,int target)
         {
+            int damage=0;
+            if (player == true)
+            {
+                //checks if the target dodges and changes damage to 0
+                damage = Program.Team1[attacker].characterDamage();
+                if (Program.Team2[target].dodge() == true){
+                    Console.WriteLine("{0} dodges the attack!",Program.Team2[target].characterName);
+                    damage = 0;
+                }
+                    //checks if the target block the attack and changes damage to 0
+                else if (Program.Team2[target].block() == true)
+                {
+                    Console.WriteLine("{0} blocks the attack!",Program.Team2[target].characterName);
+                    damage = 0;
+                }
+                else
+                {
+                    //check the attacker ins't a mage, if they aren't then apply armour
+                    if (Program.Team1[attacker].Job != 3){
+                        damage = damage*(Program.Team2[target].armour/100);
+                    }
+                }
+            }
 
+                //duplicate code not sure how to to this atm. might have to place the two lists into an array.
+            else
+            {
+                damage = Program.Team2[attacker].characterDamage();
+                if (Program.Team1[target].dodge() == true)
+                {
+                    Console.WriteLine("{0} dodges the attack!", Program.Team1[target].characterName);
+                    damage = 0;
+                }
+                else if (Program.Team1[target].block() == true)
+                {
+                    Console.WriteLine("{0} blocks the attack!", Program.Team1[target].characterName);
+                    damage = 0;
+                }
+                else
+                {
+                    if (Program.Team2[attacker].Job != 3)
+                    {
+                        damage = damage * (Program.Team1[target].armour / 100);
+                    }
+                }
+            }
+
+
+            if (player == true)
+            {
+                Program.Team2[target].takedamage(damage);
+            }
+            else
+            {
+                Program.Team1[target].takedamage(damage);
+            }
         }
+
+
         /// <summary>
         /// apply healing to target
         /// </summary>

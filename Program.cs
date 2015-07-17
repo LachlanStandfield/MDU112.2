@@ -71,6 +71,31 @@ class Program
         return valid;
     }
 
+    /// <summary>
+    /// Create enemies
+    /// </summary>
+    void createEnemy()
+    {
+        string[] randomName = new string[4] { "Dick", "Dickinson", "Dickus", "John" };
+        string[] randomTitle = new string[4] { "The Killer", "The Dick", "The Reckless", "The Grumpy" };
+        string[] randomTeamName = new string[12] { "Killer", "Sandy", "Salty", "Sexual", "Angry", "Silent", "Men", "Killers", "Rascals", "Gentlemen", "Freaks", "Boys" };
+
+        team2Name = "The " + randomTeamName[rng(0, randomTeamName.Length / 2)] + " " + randomTeamName[rng(randomTeamName.Length / 2, randomTeamName.Length)];
+        for (int count = 0; count < numberOfPlayers; count++)
+        {
+            //create random character
+            Team2.Add(new Character() { characterName = (randomName[rng(0, (randomName.Length))] + " " + randomTitle[rng(0, (randomTitle.Length))]), Job = rng(0, 4) });
+            Team2[count].teamName = team2Name;
+            Team2[count].characterID = assignID;
+            assignID++;
+            Team2[count].XP = rng(1,100)+(Team1[count].level*100);
+            Team2[count].Levelup();
+
+            //announce them
+            Team2[count].PrintStats();
+        }
+
+    }
 
 
 
@@ -202,9 +227,7 @@ class Program
     ///</summary>
     public void Run2()
     {
-        string[] randomName = new string[4] { "Dick", "Dickinson", "Dickus", "John" };
-        string[] randomTitle = new string[4] { "The Killer", "The Dick", "The Reckless", "The Dick" };
-        string[] randomTeamName = new string[12] { "Murder", "Kill", "Cash", "Money", "Sexual", "Sensual", "Quiet", "Rowdy", "Randy", "Eloquent", "Soft", "Velvet" };
+        
        
         //intro text
         Console.WriteLine("WELCOME CHALLENGERS TO CYBER AREA 20XX 2: TEAM BATTLE TOURNAMENT");
@@ -225,27 +248,8 @@ class Program
         Console.Clear();
 
         createPlayerCharacter();
+        createEnemy();
 
-
-
-        team2Name = "Team "+randomTeamName[rng(0, randomTeamName.Length)] + " " + randomTeamName[rng(0, randomTeamName.Length)];
-        for (int count = 0; count < numberOfPlayers; count++)
-        {
-            //create random character
-            Team2.Add(new Character() { characterName = (randomName[rng(0, (randomName.Length))] + " " + randomTitle[rng(0, (randomTitle.Length))]), Job = rng(0, 4) });
-            Team2[count].teamName = team2Name;
-            Team2[count].characterID = assignID;
-            assignID++;
-            Team2[count].XP += rng(1000, 100000);
-            Team2[count].Levelup();
-
-            //announce them
-            Team2[count].PrintStats();
-
-
-
-
-        }
         Console.ReadKey();
         Combat Combatphase = new Combat();
         Combatphase.turnOrder();
@@ -270,19 +274,7 @@ class Program
         Team1[1].PrintStats();
         Team1[2].PrintStats();
         Team1[3].PrintStats();
-        team2Name = "Bad Dudes";
-        Team2.Add(new Character() { characterID = 5, characterName = "Bad Tank", Job = 0, XP = 300, teamName = team2Name });
-        Team2.Add(new Character() { characterID = 6, characterName = "Bad Warrior", Job = 1, XP = 300, teamName = team2Name });
-        Team2.Add(new Character() { characterID = 7, characterName = "Bad Rogue", Job = 2, XP = 300, teamName = team2Name });
-        Team2.Add(new Character() { characterID = 8, characterName = "Bad Mage", Job = 3, XP = 300, teamName = team2Name });
-        Team2[0].Levelup();
-        Team2[1].Levelup();
-        Team2[2].Levelup();
-        Team2[3].Levelup();
-        Team2[0].PrintStats();
-        Team2[1].PrintStats();
-        Team2[2].PrintStats();
-        Team2[3].PrintStats();
+        createEnemy();
         Combat Combatphase = new Combat();
         Combatphase.turnOrder();
         Combatphase.battleInfo();

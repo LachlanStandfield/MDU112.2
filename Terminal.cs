@@ -10,6 +10,9 @@ namespace MDU112_Framework
     {
         static void Main(string[] args)
         {
+            Console.WindowTop = 0;
+            Console.WindowWidth = 100;
+            Console.SetWindowSize(100, 50);
             //Create a new instance of the program class
             Program program = new Program();
 
