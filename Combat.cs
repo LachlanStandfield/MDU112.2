@@ -14,9 +14,31 @@ using System.Threading.Tasks;
 
 
         Random r = new Random();
-        //twenty possible turns, 33 is placed in the free spaces to prevent one of the of player IDs being used
+        /// <summary>
+        /// twenty possible turns, 33 is placed in the free spaces to prevent one of the of player IDs being used
+        /// </summary>
         int[] turns = new int[20] { 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33 };
+        List<int> availableTurns = new List<int>();
 
+
+         int checkNumberAnswer()
+        {
+            int? number = null;
+            int numcheck;
+            while (number == null)
+            {
+                string Answer = Console.ReadLine();
+                if (int.TryParse(Answer, out numcheck))
+                {
+                    number = Convert.ToInt32(Answer);
+                }
+                else
+                {
+                    Console.WriteLine("Please enter a number");
+                }
+            }
+            return Convert.ToInt32(number);
+        }
 
         int turnOrderCount;
         int specialEyes = 0;
@@ -53,26 +75,24 @@ using System.Threading.Tasks;
             Console.WriteLine("       BATTLE INFO");
             Console.WriteLine("---------------------------");
             Console.WriteLine("    v v TURN ORDER v v");
-            for (int i = 0; i < (Program.numberOfPlayers*2); i++)
+            Console.WriteLine();
+            turnOrderFill();
+            for (int i = 0; i < availableTurns.Count; i++ )
             {
-                if (turns[i] != 33)
+                if (availableTurns[i] < Program.numberOfPlayers)
                 {
-
-                    if (turns[i] <= (Program.numberOfPlayers - 1))
-                    {
-                        Console.WriteLine();
-                        Console.WriteLine(Program.Team1[turns[i]].statBrief());
-                    }
-
-                    else
-                    {
-                        Console.WriteLine();
-                        Console.WriteLine(Program.Team2[(turns[i] - Convert.ToInt32(Program.numberOfPlayers))].statBrief());
-
-                    }
+                    Console.WriteLine((i+1)+" "+Program.Team1[availableTurns[i]].statBrief());
+                    Console.WriteLine();
+                }
+                else
+                {
+                    Console.WriteLine((i+1)+" "+Program.Team2[availableTurns[i] - Convert.ToInt32(Program.numberOfPlayers)].statBrief());
+                    Console.WriteLine();
                 }
             }
+
         }
+
 
 
 
@@ -106,7 +126,7 @@ using System.Threading.Tasks;
 
 
         /// <summary>
-        /// checks turn id value against other turns to make sure there are no duplicates
+        /// checks turn indx value against other turns to make sure there are no duplicates
         /// </summary>
 
         bool checkAgainstOthers(int toCheck)
@@ -134,7 +154,30 @@ using System.Threading.Tasks;
             return valid;
         }
 
-
+     public   void turnOrderFill()
+        {
+            availableTurns.Clear();
+            for( int element=0; element <Program.numberOfPlayers*2; element ++)
+            {
+                if (turns[element] != 33)
+                {
+                    if (turns[element] < Program.numberOfPlayers)
+                    {
+                        if (Program.Team1[turns[element]].isDead == false)
+                        {
+                            availableTurns.Add(turns[element]);
+                        }
+                    }
+                    else
+                    {
+                        if (Program.Team2[turns[element]-Convert.ToInt32(Program.numberOfPlayers)].isDead == false)
+                        {
+                            availableTurns.Add(turns[element]);
+                        }
+                    }
+                }
+            }
+        }
 
 
         /// <summary>
@@ -162,8 +205,82 @@ using System.Threading.Tasks;
         ///1. John Hero 200/200 2.Jim Hero 200/200 3. Jason Hero 153/200 4.Jim Baddy 100/300 5.John Baddy 75/150 6.Harold Baddy 100/250
         ///if you scan then you print their stats, including if they're being defended
 
-        public void combatphase(int team, int player)
+        public void playerOptions(int playerIndex)
         {
+            Console.WriteLine( Program.Team1[playerIndex].statBrief()+" - TURN -");
+            Console.WriteLine();
+            //Console.WriteLine("{1} {0} -TURN-",Program.Team1[playerIndex].jobNames[Program.Team1[playerIndex].Job],Program.Team1[playerIndex].characterName);
+            Console.WriteLine("SELCET ACTION");
+            Console.WriteLine();
+            Console.WriteLine("1. ATTACK 2. HEAL 3. DEFEND 4. SCAN 5. HOLD 6. TURN ORDER");
+            int input = checkNumberAnswer();
+            if (input == 4)
+            {
+                scan(playerIndex);
+            }
+            
+
+        }
+
+
+
+        void scan(int playerIndex)
+        {
+            int selection;
+            Console.WriteLine();
+            Console.WriteLine("SELECT TARGET TO SCAN");
+            Console.WriteLine();
+            for (int i = 0; i < Program.Team1.Count; i++)
+            {
+                if (Program.Team1[i].isDead == false)
+                {
+                    Console.WriteLine((i + 1) + ". " + Program.Team1[i].statBrief());
+                }
+            }
+            //duplicate code, must place teams in a nested array to fix this
+            for (int i = 0; i < Program.Team1.Count; i++)
+            {
+                if (Program.Team2[i].isDead == false)
+                {
+                    Console.WriteLine((i + 1 + Program.Team1.Count) + ". " + Program.Team2[i].statBrief());
+                }
+            }
+            selection = checkNumberAnswer()-1;
+            Console.WriteLine("SCANNING...");
+            if (selection < 0 || selection > Program.numberOfPlayers * 2-1)
+            {
+                Console.WriteLine("INVALID TARGET");
+            }
+            else
+            {
+            if (selection < Program.Team1.Count)
+            {
+                if (Program.Team1[selection].isDead == false)
+                {
+                    Program.Team1[selection].PrintStats();
+                }
+                else
+                {
+                    Console.WriteLine("INVALID TARGET");
+                }
+            }
+            else
+            {
+                if (Program.Team2[selection - Program.Team2.Count].isDead == false)
+                {
+                    Program.Team2[selection - Program.Team2.Count].PrintStats();
+                }
+                else
+                {
+                    Console.WriteLine("INVALID TARGET");
+                }
+                
+            }
+
+            }
+            Program.pressToContinue();
+            Console.Clear();
+            playerOptions(playerIndex);
 
         }
 
@@ -178,8 +295,11 @@ using System.Threading.Tasks;
         /// </summary>
         void playerCombat()
         {
-
+            
+      
         }
+
+        
 
 
         /// <summary>
@@ -197,6 +317,51 @@ using System.Threading.Tasks;
         }
 
 
+        /// <summary>
+        /// checks to see if team 1 is dead team is dead
+        /// </summary>
+
+       /// <summary>
+       /// checks to see if team 1 is dead
+       /// </summary>
+       bool isEveryoneDead1()
+       {
+           int deaths = 0;
+           bool yes = false;
+           for (int i = 0; i < Program.numberOfPlayers; i++)
+           {
+               if (Program.Team1[i].isDead)
+               {
+                   deaths++;
+               }
+           }
+           if (deaths == Program.Team1.Count)
+           {
+               yes = true;
+           }
+           return yes;
+       }
+
+       /// <summary>
+       /// checks to see if team 2 is dead
+       /// </summary>
+       bool isEveryoneDead2()
+       {
+           int deaths = 0;
+           bool yes = false;
+           for (int i = 0; i < Program.numberOfPlayers; i++)
+           {
+               if (Program.Team2[i].isDead)
+               {
+                   deaths++;
+               }
+           }
+           if (deaths == Program.Team2.Count)
+           {
+               yes = true;
+           }
+           return yes;
+       }
 
         /// <summary>
         /// apply damage to target, base damage value is found in the character class, checks against defender's defensive stats

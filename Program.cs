@@ -30,7 +30,7 @@ class Program
     ///Check answer for number, then return that number
     ///</summary>
 
-    int? checkNumberAnswer()
+    int checkNumberAnswer()
     {
         int? number = null;
         int numcheck;
@@ -46,7 +46,7 @@ class Program
                 Console.WriteLine("Please enter a number");
             }
         }
-        return number;
+        return Convert.ToInt32(number);
     }
 
 
@@ -76,8 +76,8 @@ class Program
     /// </summary>
     void createEnemy()
     {
-        string[] randomName = new string[7] { "DICK", "DIRTY", "CASH", "JOHN", "JONATHAN","DIO","SMOKEY" };
-        string[] randomTitle = new string[7] { "DOE", "BADDY", "DAN", "DICK","JOESTAR","BRANDO","MONEY" };
+        string[] randomName = new string[10] { "DICK", "DIRTY", "CASH", "JOHN", "JONATHAN","DIO","SMOKEY","BRUCE","BIG","LITTLE" };
+        string[] randomTitle = new string[10] { "DOE", "BADDY", "DAN", "ZEPPELI","JOESTAR","BRANDO","MONEY","CENA","JOHNSON","WAYNE" };
         string[] randomTeamName = new string[12] { "KILLER", "SANDY", "SALTY", "SEXUAL", "ANGRY", "SILENT", "MEN", "KILLERS", "RASCALS", "GENTLEMEN", "FREAKS", "BOYS" };
 
         team2Name = "[THE " + randomTeamName[rng(0, randomTeamName.Length / 2)] + " " + randomTeamName[rng(randomTeamName.Length/2, randomTeamName.Length)]+"]";
@@ -145,7 +145,7 @@ class Program
             {
                 Console.WriteLine("CHOOSE "+ Team1[counter].characterName+"'S JOB");
                 Console.WriteLine("0. {0}    1. {1}   2. {2}   3. {3}", Team1[0].jobNames[0], Team1[0].jobNames[1], Team1[0].jobNames[2], Team1[0].jobNames[3]);
-                Team1[counter].Job = Convert.ToInt32(checkNumberAnswer());
+                Team1[counter].Job = checkNumberAnswer();
                 if (Team1[counter].Job > 3)
                 {
                     Team1[counter].Job = 0;
@@ -267,14 +267,22 @@ class Program
         Combat Combatphase = new Combat();
         Console.WriteLine(" TURN ORDER TEST");
         Combatphase.turnOrder();
+        Combatphase.turnOrderFill();
         Combatphase.battleInfo();
-        Console.ReadKey();
-        Console.WriteLine();
-        Combatphase.testRemove();
+        Console.WriteLine(" DEATH TEST");
+        pressToContinue();
+        for (int i = 0; i < numberOfPlayers; i++)
+        {
+            Team1[i].isDead = true;
+        }
+        Team1[1].isDead = false;
+        Team2[1].defender = 2;
+        Team2[1].defended = true;
         Combatphase.battleInfo();
-        Console.ReadKey();
-        Console.WriteLine();
+        pressToContinue();
         Console.Clear();
+        Combatphase.playerOptions(1);
+        pressToContinue();
         Console.WriteLine(" --BATTLE TEST--");
         Console.WriteLine();
         //combat tests
@@ -294,10 +302,10 @@ class Program
         int testXP = 100;
         numberOfPlayers = 4;
         team1Name = "[TEAM TESTER]";
-        Team1.Add(new Character() { characterID = 1, characterName = "[TEST TANK]", Job = 0, XP = testXP, teamName = team1Name });
-        Team1.Add(new Character() { characterID = 2, characterName = "[TEST WARRIOR]", Job = 1, XP = testXP, teamName = team1Name });
+        Team1.Add(new Character() { characterID = 1, characterName = "[TEST TANK]", Job = 0, XP = testXP, teamName = team1Name  });
+        Team1.Add(new Character() { characterID = 2, characterName = "[TEST WARRIOR]", Job = 1, XP = testXP, teamName = team1Name});
         Team1.Add(new Character() { characterID = 3, characterName = "[TEST ROGUE]", Job = 2, XP = testXP, teamName = team1Name });
-        Team1.Add(new Character() { characterID = 4, characterName = "[TEST MAGE]", Job = 3, XP = testXP, teamName = team1Name });
+        Team1.Add(new Character() { characterID = 4, characterName = "[TEST MAGE]", Job = 3, XP = testXP, teamName = team1Name, defender = 0, defended= true });
         Team1[0].Levelup();
         Team1[1].Levelup();
         Team1[2].Levelup();

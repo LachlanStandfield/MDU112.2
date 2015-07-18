@@ -73,11 +73,11 @@ using System.Threading.Tasks;
            int number = r.Next(min, max);
            return number;
        }
-
+       
 
        public string statBrief()
        {
-           return jobNames[Job] + " " + characterName + " " + HP + "/" + maxHealth;
+           return characterName + " THE " + jobNames[Job] + " " + HP + "/" + maxHealth;
        }
 
 
@@ -113,9 +113,10 @@ using System.Threading.Tasks;
            //if they're being defended by somone then print their stats too
            if (defended == true)
            {
-               Console.WriteLine();
-               Console.WriteLine("DEFENDED BY ");
+               Console.Write("DEFENDED BY ");
                Console.Write(Program.Team1[defender].statBrief());
+               Console.WriteLine();
+               Console.WriteLine();
            }
 
 
