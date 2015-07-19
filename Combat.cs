@@ -229,6 +229,11 @@ using System.Threading.Tasks;
 
                 }
                 actionInput = checkNumberAnswer();
+                if (checkInvalidTarget(actionInput, 1, playerIndex))
+                {
+                    playerOptions(playerIndex);
+                    return;
+                }
                 dealdamage(playerIndex, actionInput - 1, 0, 1);
                 actionTaken = true;
 
@@ -249,22 +254,8 @@ using System.Threading.Tasks;
 
                 }
                 actionInput = checkNumberAnswer();
-                if (actionInput < 1 || actionInput > Program.Teams[0].Count)
+                if (checkInvalidTarget(actionInput, 0, playerIndex))
                 {
-                    Console.WriteLine();
-                    Console.WriteLine("INVALID TARGET");
-                    Program.pressToContinue();
-                    Console.Clear();
-                    playerOptions(playerIndex);
-                    return;
-
-                }
-                if (Program.Teams[0][actionInput - 1].isDead == true)
-                {
-                    Console.WriteLine();
-                    Console.WriteLine("INVALID TARGET");
-                    Program.pressToContinue();
-                    Console.Clear();
                     playerOptions(playerIndex);
                     return;
                 }
@@ -382,8 +373,34 @@ using System.Threading.Tasks;
             playerOptions(playerIndex);
 
         }
-        
+        /// <summary>
+        /// checks if the player made an invalid input when selecting a target for attacking or healing
+        /// </summary>
+        /// <param name="actionInput"></param>
+        /// <param name="targetTeam"></param>
+        /// <param name="?"></param>
+        bool checkInvalidTarget(int actionInput, int targetTeam, int playerIndex)
+        {
+            bool invalidTarget = false;
+            if (actionInput < 1 || actionInput > Program.Teams[targetTeam].Count)
+            {
+                Console.WriteLine();
+                Console.WriteLine("INVALID TARGET");
+                Program.pressToContinue();
+                Console.Clear();
+                invalidTarget = true;
 
+            }
+            else if (Program.Teams[targetTeam][actionInput - 1].isDead == true)
+            {
+                Console.WriteLine();
+                Console.WriteLine("INVALID TARGET");
+                Program.pressToContinue();
+                Console.Clear();
+                invalidTarget = true;
+            }
+            return invalidTarget;
+        }
 
         /// <summary>
         /// Ai chooses their target
