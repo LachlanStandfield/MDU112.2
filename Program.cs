@@ -12,7 +12,7 @@ class Program
    public string team2Name;
    int assignID = 1;
    public static int numberOfPlayers;
-
+   public int roundNumber;
 
 
     ///<summary>
@@ -207,12 +207,12 @@ class Program
     void choosePlayerNumber()
     {
 
-        Console.WriteLine("HOW MANY PLAYERS PER TEAM? (2-5)");
+        Console.WriteLine("HOW MANY PLAYERS PER TEAM? (2-10)");
         numberOfPlayers = checkNumberAnswer();
-        if (numberOfPlayers < 2 || numberOfPlayers > 5)
+        if (numberOfPlayers < 2 || numberOfPlayers > 10)
         {
             Console.WriteLine();
-            Console.WriteLine("INVALID NUMBER (2-5)");
+            Console.WriteLine("INVALID NUMBER (2-10)");
             choosePlayerNumber();
             return;
         }
@@ -270,41 +270,19 @@ class Program
         testMen();
         createEnemy();
         Combat Combatphase = new Combat();
-        Console.WriteLine(" TURN ORDER TEST");
         Combatphase.turnOrder();
-        Combatphase.turnOrderFill();
         Combatphase.turnOrderPrint();
-        Console.WriteLine(" --DEATH TEST--");
-        pressToContinue();
-        for (int i = 0; i < numberOfPlayers; i++)
-        {
-            Teams[0][i].isDead = true;
-        }
-        Teams[0][1].isDead = false;
-        Teams[0][3].isDead = false;
-        Teams[1][2].defending = true;
-        Teams[1][1].defender = 2;
-        Teams[1][1].defended = true;
-        Combatphase.turnOrderPrint();
-        pressToContinue();
         Console.Clear();
-        Combatphase.playerOptions(1);
+        Combatphase.nextTurn(false);
         pressToContinue();
         Console.WriteLine(" --BATTLE TEST--");
         Console.WriteLine();
-        //combat tests
-        //for (int i = 0; i < 50; i++)
-        //{
-        //    Combatphase.dealdamage( rng(1,numberOfPlayers), rng(1, numberOfPlayers),0,1);
-        //    Combatphase.dealdamage(rng(1, numberOfPlayers), rng(1, numberOfPlayers), 1, 0);
-            
-       // }
 
     }
 
     void testMen()
     {
-        int testXP = 1000;
+        int testXP = 100;
         numberOfPlayers = 4;
         team1Name = "[TEAM TESTER]";
         Team1.Add(new Character() { characterID = 1, characterName = "[TEST TANK]", Job = 0, XP = testXP, teamName = team1Name  });

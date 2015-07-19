@@ -8,6 +8,8 @@ using System.Threading.Tasks;
     class Combat
 
     {
+
+        int turnCount=1;
         //used to print the combat info
         int comabtlogTurnNumber;
         List<string> combatLog = new List<string>();
@@ -63,7 +65,14 @@ using System.Threading.Tasks;
             Console.WriteLine("        TURN ORDER");
             Console.WriteLine("---------------------------");
             Console.WriteLine();
-            turnOrderFill();
+            if (turnCount == 1)
+            {
+                turnOrderFill(true);
+            }
+            else
+            {
+                turnOrderFill(false);
+            }
             for (int i = 0; i < availableTurns.Count; i++ )
             {
                 if (availableTurns[i] < Program.numberOfPlayers)
@@ -77,12 +86,14 @@ using System.Threading.Tasks;
                     Console.WriteLine();
                 }
             }
+            Program.pressToContinue();
+            Console.Clear();
 
         }
 
 
         /// <summary>
-        /// determines player order according to a random number 
+        /// determines player order according to a random number CURRENTLY ONLY RNG
         /// which is influenced by the dex stat of each character
         /// </summary>
         public void turnOrder()
@@ -138,39 +149,62 @@ using System.Threading.Tasks;
         /// <summary>
         /// fill the turn order list
         /// </summary>
-     public   void turnOrderFill()
+     public   void turnOrderFill(bool phasestart)
         {
-            availableTurns.Clear();
-            for( int element=0; element <Program.numberOfPlayers*2; element ++)
+            if (phasestart)
             {
-                if (turns[element] != 33)
+                availableTurns.Clear();
+                for (int i = 0; i < Program.numberOfPlayers * 2; i++)
                 {
-                    if (turns[element] < Program.numberOfPlayers)
+                    if (turns[i] != 33)
                     {
-                        if (Program.Team1[turns[element]].isDead == false)
+                        if (turns[i] < Program.numberOfPlayers)
                         {
-                            availableTurns.Add(turns[element]);
+                            if (Program.Team1[turns[i]].isDead == false)
+                            {
+                                availableTurns.Add(turns[i]);
+                            }
                         }
-                    }
-                    else
-                    {
-                        if (Program.Teams[1][turns[element]-Convert.ToInt32(Program.numberOfPlayers)].isDead == false)
+                        else
                         {
-                            availableTurns.Add(turns[element]);
+                            if (Program.Teams[1][turns[i] - Program.numberOfPlayers].isDead == false)
+                            {
+                                availableTurns.Add(turns[i]);
+                            }
                         }
                     }
                 }
             }
+            else
+            {
+                for (int i = 0; i < availableTurns.Count;i++)
+                {
+                    if (availableTurns[i] < Program.numberOfPlayers)
+                    {
+                        if (Program.Teams[0][availableTurns[i]].isDead)
+                        {
+                            availableTurns.Remove(availableTurns[i]);
+                        }
+                    }
+                    else
+                    {
+                        if (Program.Teams[1][availableTurns[i]-Program.numberOfPlayers].isDead)
+                        {
+                            availableTurns.Remove(availableTurns[i]);
+                        }
+                    }
+                }
+            }
+                    
         }
 
 
         /// <summary>
-        /// main combat sequence, team and player specifies who's fighting at 
-        /// the time, if they're ai then the it itiliases thr ai commands otherwise the player chooses their move
+        /// Player chooses their command. AI doesn't use this menu
         /// </summary>
         ///             
         ///choose action
-        ///1.Attack  2.Defend  3.Heal  4.Hold  5.Scan
+        ///1.Attack  2.Defend  3.Heal  4.Scan  5.Hold 6. Turn Order
         ///
         ///Attack Who?
         ///for each character display name and health with number to select them based on their ID
@@ -179,18 +213,25 @@ using System.Threading.Tasks;
         /// Defend Who?
         /// Displays characters able to be defended, this includes themself
         /// 1. Self 200/200  2. John Hero 200/200 3. Jason Hero 153/200
-        /// if you defend smomone else then the defend other method is called with Jim as the acitve defender
+        /// 
         /// 
         /// Heal Who?
-        /// displays allies with less than full health
-        /// 1. Self 199/200   3. Jason Hero 153/200*
+        /// displays allies
+        /// 1. Self 199/200  2.John Hero 200/200 3. Jason Hero 153/200*
+        /// 
         ///Scan who?
         ///for each character display name and health with number to select them based on their ID
         ///1. John Hero 200/200 2.Jim Hero 200/200 3. Jason Hero 153/200 4.Jim Baddy 100/300 5.John Baddy 75/150 6.Harold Baddy 100/250
         ///if you scan then you print their stats, including if they're being defended
+        ///.
+        ///5.Hold
+        ///Sends the character to the back of the queue, this can be used by AI too
+        ///.
+        ///6. Turn Order, print turn order
 
         public void playerOptions(int playerIndex)
         {
+            bool holding = false;
             int actionInput;
             bool actionTaken = false;
             Console.WriteLine( Program.Team1[playerIndex].statBrief()+" - TURN -");
@@ -282,6 +323,8 @@ using System.Threading.Tasks;
             if (input == 5)
             {
                 hold(playerIndex, 0);
+                holding = true;
+                actionTaken = true;
             }
             //turnorder
             if (input == 6)
@@ -290,7 +333,10 @@ using System.Threading.Tasks;
             }
             if (actionTaken == true)
             {
-                nextTurn();
+                if (holding){
+                    nextTurn(true);
+                }
+                nextTurn(false);
             }
             else
             {
@@ -302,10 +348,37 @@ using System.Threading.Tasks;
 
         }
 
-        void nextTurn()
-        {
 
+        /// <summary>
+        /// advance the turns forward, plays ai code if the character is on the enemy team otherwise directs to the player options
+        /// </summary>
+       public void nextTurn(bool hold)
+        {
+            Console.WriteLine("TURN "+turnCount);
+            if (turnCount > 1)
+            {
+                if (hold)
+                {
+
+                }
+                else
+                {
+                    availableTurns.Remove(availableTurns[0]);
+                }
+            }
+            turnCount++;
+            turnOrderPrint();
+            if (availableTurns[0] < Program.numberOfPlayers)
+            {
+                playerOptions(availableTurns[0]);
+            }
+            else
+            {
+                AIcombat(availableTurns[0]);
+            }
         }
+
+
         /// <summary>
         /// Character Passes their turn until Last.
         /// probably gonna be used for a mage to heal someone, ai  has a 20% to do this if they're a mage
@@ -313,7 +386,20 @@ using System.Threading.Tasks;
         /// <param name="playerIndex"></param>
         void hold(int playerIndex, int teamNumber)
         {
-
+            List<int> tempTurns = new List<int>();
+            for (int i = 0; i < availableTurns.Count; i++)
+            {
+                tempTurns.Add(availableTurns[i]);
+            }
+            availableTurns[availableTurns.Count-1] = tempTurns[0];
+            for (int i = 0; i < availableTurns.Count-1; i++)
+            {
+                availableTurns[i] = tempTurns[i + 1];
+            }
+            for (int i = 0; i < availableTurns.Count ; i++)
+            {
+                turns[i] = availableTurns[i];
+            }
         }
 
         /// <summary>
@@ -441,6 +527,8 @@ using System.Threading.Tasks;
             Console.Clear();
 
         }
+
+
         /// <summary>
         /// List player allies
         /// </summary>
@@ -474,9 +562,9 @@ using System.Threading.Tasks;
         /// if they're a rogue then they'll attack regardless, rogues are pricks.
         /// default behavior is just to attack the lowest health target
         /// </summary>
-        void AIcombat()
+        void AIcombat(int botID)
         {
-
+            nextTurn(false);
         }
 
 
@@ -509,7 +597,8 @@ using System.Threading.Tasks;
        public void dealdamage(int attacker, int target, int attackerTeamNumber, int defenderTeamNumber)
        {
            int damage;
-           Console.Clear();
+           Console.WriteLine();
+           Console.WriteLine();
            //check if the target is being defended by another, then retarget the defender
            if (Program.Teams[defenderTeamNumber][target].defended)
            {
