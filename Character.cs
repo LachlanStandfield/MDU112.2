@@ -64,9 +64,11 @@ using System.Threading.Tasks;
        //defensive stance lasts until this character's next turn
        int defenceArmour;
        int defenceBlock;
+       public bool defendingOther = false;
        public bool defending = false;
        public bool defended = false;
        public int defender;
+       public int defendedID;
 
 
        //random number generator

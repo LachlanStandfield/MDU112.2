@@ -231,12 +231,16 @@ using System.Threading.Tasks;
 
         public void playerOptions(int playerIndex)
         {
+            Console.Clear();
+            //turn off defending
+            Program.Teams[0][playerIndex].defendingOther = false;
+            Program.Teams[0][playerIndex].defending = false;
+            Program.Teams[0][Program.Teams[0][playerIndex].defendedID].defended = false;
             bool holding = false;
             int actionInput;
             bool actionTaken = false;
             Console.WriteLine( Program.Team1[playerIndex].statBrief()+" - TURN -");
             Console.WriteLine();
-            //Console.WriteLine("{1} {0} -TURN-",Program.Team1[playerIndex].jobNames[Program.Team1[playerIndex].Job],Program.Team1[playerIndex].characterName);
             Console.WriteLine("SELCET ACTION");
             Console.WriteLine();
             Console.WriteLine("1. ATTACK  2. HEAL  3. DEFEND  4. SCAN 5. HOLD  6. TURN ORDER");
@@ -333,19 +337,27 @@ using System.Threading.Tasks;
             }
             if (actionTaken == true)
             {
-                if (holding){
+                if (holding)
+                {
+                    Program.pressToContinue();
+                    Console.Clear();
                     nextTurn(true);
+                    return;
                 }
-                nextTurn(false);
+                else
+                {
+                    Program.pressToContinue();
+                    Console.Clear();
+                    nextTurn(false);
+                    return;
+                }
             }
             else
             {
                 playerOptions(playerIndex);
+                Console.Clear();
                 return;
             }
-            Console.Clear();
-            
-
         }
 
 
@@ -705,21 +717,13 @@ using System.Threading.Tasks;
         /// </summary>
        void defend(int defendTarget, int defender, int teamIndex)
        {
-           //if they're already defended , then they're an invalid target, they can be defending themself though
-           if (Program.Teams[teamIndex][defendTarget].defended)
+           //if they're already defended , then they're an invalid target, they can be defending themself though. You can't stack up defenders either.
+           if (Program.Teams[teamIndex][defendTarget].defended == true|| Program.Teams[teamIndex][defendTarget].defendingOther == true|| Program.Teams[teamIndex][defender].defended == true)
            {
-               //checks to see if it's the player, MIGHT CHANGE THIS IF I CAN GET BOTH TEAMS TO USE AI
-               if (teamIndex == 0)
-               {
                    Console.WriteLine("INVALID TARGET");
+                   Program.pressToContinue();
                    playerOptions(defender);
                    return;
-               }
-                   //if they're an ai then return to the ai programming, this probably won't happen THOUGH as the ai program won't pick a defended target SO COME BACK AND FIX IT
-               else
-               {
-
-               }
 
            }
            else
@@ -735,6 +739,8 @@ using System.Threading.Tasks;
                    Console.WriteLine();
                    Console.WriteLine("{0} ENTERS A DEFENSIVE STANCE IN FRONT OF {1}", Program.Teams[teamIndex][defender].statBrief(), Program.Teams[teamIndex][defendTarget].statBrief());
                    Program.Teams[teamIndex][defender].defending = true;
+                   Program.Teams[teamIndex][defender].defendedID = Program.Teams[teamIndex][defendTarget].characterID - 1;
+                   Program.Teams[teamIndex][defender].defendingOther = true;
                    Program.Teams[teamIndex][defendTarget].defended = true;
                    Program.Teams[teamIndex][defendTarget].defender = defender;
                }
