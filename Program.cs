@@ -7,10 +7,11 @@ class Program
    Random r = new Random();
    public static List<Character> Team1 = new List<Character>();
    public static List<Character> Team2 = new List<Character>();
+   public static List<Character>[] Teams = new List<Character>[2]{Team1,Team2};  
    public string team1Name;
    public string team2Name;
    int assignID = 1;
-   public static int? numberOfPlayers;
+   public static int numberOfPlayers;
 
 
 
@@ -84,15 +85,15 @@ class Program
         for (int count = 0; count < numberOfPlayers; count++)
         {
             //create random character
-            Team2.Add(new Character() { characterName = "["+(randomName[rng(0, (randomName.Length))] + " " + randomTitle[rng(0, (randomTitle.Length))]+"]"), Job = rng(0, 4) });
-            Team2[count].teamName = team2Name;
-            Team2[count].characterID = assignID;
+            Teams[1].Add(new Character() { characterName = "["+(randomName[rng(0, (randomName.Length))] + " " + randomTitle[rng(0, (randomTitle.Length))]+"]"), Job = rng(0, 4) });
+            Teams[1][count].teamName = team2Name;
+            Teams[1][count].characterID = assignID;
             assignID++;
-            Team2[count].XP = rng(1,100)+(Team1[count].level*100);
-            Team2[count].Levelup();
+            Teams[1][count].XP = rng(1,100)+(Team1[count].level*100);
+            Teams[1][count].Levelup();
 
             //announce them
-            Team2[count].PrintStats();
+            Teams[1][count].PrintStats();
         }
 
     }
@@ -113,7 +114,7 @@ class Program
         {
             Console.WriteLine("TEAM NAME:");
             team1Name = ("TEAM "+ Console.ReadLine());
-            Console.WriteLine("SO YOU'RE {0} THEN? Y/N", team1Name);
+            Console.WriteLine("SO YOUR TEAM IS CALLED {0}? Y/N", team1Name);
             valid = yesOrNo(Console.ReadLine());
         }
         valid = false;
@@ -131,7 +132,7 @@ class Program
             //asks for their name
             while (valid == false)
             {
-                Console.WriteLine("ENTER THE NAME FOR {1}, FIGHTER {0}", Team1[counter].characterID,team1Name);
+                Console.WriteLine("ENTER THE NAME FOR {1}, FIGHTER {0}:", Team1[counter].characterID,team1Name);
                 Team1[counter].characterName = Console.ReadLine();
                 Console.WriteLine(Team1[counter].characterName+", REGISTERED. PROCEED? Y/N");
 
@@ -211,9 +212,6 @@ class Program
         Console.WriteLine();
         Console.WriteLine("{0} PLAYERS PER TEAM", numberOfPlayers);
         Console.WriteLine();
-        //Team1.Add(new Character() {characterName ="Zero" });
-        //Team2.Add(new Character() { characterName ="Zero"});
-       // numberOfPlayers++;
     }
 
 
@@ -268,17 +266,17 @@ class Program
         Console.WriteLine(" TURN ORDER TEST");
         Combatphase.turnOrder();
         Combatphase.turnOrderFill();
-        Combatphase.battleInfo();
-        Console.WriteLine(" DEATH TEST");
+        Combatphase.turnOrderPrint();
+        Console.WriteLine(" --DEATH TEST--");
         pressToContinue();
         for (int i = 0; i < numberOfPlayers; i++)
         {
-            Team1[i].isDead = true;
+            Teams[0][i].isDead = true;
         }
-        Team1[1].isDead = false;
-        Team2[1].defender = 2;
-        Team2[1].defended = true;
-        Combatphase.battleInfo();
+        Teams[0][1].isDead = false;
+        Teams[1][1].defender = 2;
+        Teams[1][1].defended = true;
+        Combatphase.turnOrderPrint();
         pressToContinue();
         Console.Clear();
         Combatphase.playerOptions(1);
@@ -286,12 +284,10 @@ class Program
         Console.WriteLine(" --BATTLE TEST--");
         Console.WriteLine();
         //combat tests
-        bool test = true;
         for (int i = 0; i < 50; i++)
         {
-            Combatphase.dealdamage(test, rng(0, Convert.ToInt32(numberOfPlayers)), rng(0, Convert.ToInt32(numberOfPlayers)));
-            Combatphase.heal(test, rng(0, Convert.ToInt32(numberOfPlayers)), rng(0, Convert.ToInt32(numberOfPlayers)));
-            test = !test;
+            Combatphase.dealdamage( rng(0, Convert.ToInt32(numberOfPlayers)), rng(0, Convert.ToInt32(numberOfPlayers)),rng(0,1),rng(0,1));
+            Combatphase.heal( rng(0, Convert.ToInt32(numberOfPlayers)), rng(0, Convert.ToInt32(numberOfPlayers)),rng(0,1));
             
         }
 
@@ -299,7 +295,7 @@ class Program
 
     void testMen()
     {
-        int testXP = 100;
+        int testXP = 1000;
         numberOfPlayers = 4;
         team1Name = "[TEAM TESTER]";
         Team1.Add(new Character() { characterID = 1, characterName = "[TEST TANK]", Job = 0, XP = testXP, teamName = team1Name  });
