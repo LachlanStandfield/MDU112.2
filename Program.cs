@@ -161,7 +161,14 @@ class Program
             while (valid == false)
             {
                 Console.Clear();
-                Console.WriteLine("...GENERATING FIGHTER...");
+                Console.WriteLine();
+                Console.Write("GENERATING FIGHTER");
+                for (int i = 0; i < 4; i++)
+                {
+                    System.Threading.Thread.Sleep(250);
+                    Console.Write(".");
+                }
+                Console.WriteLine();
                 Console.WriteLine();
                 Team1[counter].level = 0;
                 Team1[counter].XP += 100;

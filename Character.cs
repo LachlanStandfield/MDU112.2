@@ -55,7 +55,7 @@ using System.Threading.Tasks;
        public int Job;
        public string characterName;
        public string teamName;
-       public string[] jobNames = new string[4] { "[CYBER TANK]", "[MECH WARRIOR]", "[WARP ROGUE]", "[TECH MAGE]" };
+       public string[] jobNames = new string[4] { "[CYBER TANK]", "[MECHA WARRIOR]", "[WARP ROGUE]", "[TECHNO MAGE]" };
 
        //combat variables to determine whether this character is dead
        public bool isDead = false;

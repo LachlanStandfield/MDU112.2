@@ -281,7 +281,7 @@ using System.Threading.Tasks;
             //hold
             if (input == 5)
             {
-                hold(playerIndex);
+                hold(playerIndex, 0);
             }
             //turnorder
             if (input == 6)
@@ -290,18 +290,28 @@ using System.Threading.Tasks;
             }
             if (actionTaken == true)
             {
-
+                nextTurn();
             }
             else
             {
                 playerOptions(playerIndex);
                 return;
             }
+            Console.Clear();
             
 
         }
 
-        void hold(int playerIndex)
+        void nextTurn()
+        {
+
+        }
+        /// <summary>
+        /// Character Passes their turn until Last.
+        /// probably gonna be used for a mage to heal someone, ai  has a 20% to do this if they're a mage
+        /// </summary>
+        /// <param name="playerIndex"></param>
+        void hold(int playerIndex, int teamNumber)
         {
 
         }
@@ -346,10 +356,13 @@ using System.Threading.Tasks;
             Console.WriteLine();
             Console.WriteLine("SELECT TARGET TO SCAN");
             Console.WriteLine();
+
+            //lists allied team
                 for (int i = 0; i < Program.Teams[0].Count; i++)
                 {
                     if (Program.Teams[0][i].isDead == false)
                     {
+                        //Specifies that the target is themself
                         if (i == playerIndex)
                         {
                             Console.WriteLine((i + 1) + ". [SELF]");
@@ -362,7 +375,8 @@ using System.Threading.Tasks;
                         }
                     }
                 }
-            //duplicate code, not sure how to fix this one.
+
+            //lists enemy team.
             for (int i = 0; i < Program.Teams[1].Count; i++)
             {
                 if (Program.Teams[1][i].isDead == false)
@@ -371,8 +385,19 @@ using System.Threading.Tasks;
                     Console.WriteLine();
                 }
             }
+
             selection = checkNumberAnswer() - 1;
-            Console.WriteLine("SCANNING...");
+            Console.Clear();
+            Console.WriteLine();
+            Console.Write("SCANNING");
+            for (int i = 0; i < 4; i++)
+            {
+                System.Threading.Thread.Sleep(250);
+                Console.Write(".");
+            }
+            Console.WriteLine();
+            Console.WriteLine();
+            //check for invalid selection, this has one is different to the other three, as it lists both teams.
             if (selection < 0 || selection > Program.numberOfPlayers * 2 - 1)
             {
                 Console.WriteLine();
@@ -394,12 +419,14 @@ using System.Threading.Tasks;
                         Console.WriteLine();
                     }
                 }
+                    //if the selection isn't invalid then the character's stats are printed
                 else
                 {
                     if (Program.Teams[1][selection - Program.Teams[1].Count].isDead == false)
                     {
                         Program.Teams[1][selection - Program.Teams[1].Count].PrintStats();
                     }
+                        //unless they're dead. which doen't make much sense
                     else
                     {
                         Console.WriteLine();
@@ -431,8 +458,8 @@ using System.Threading.Tasks;
                     else
                     {
                         Console.WriteLine((i + 1) + ". " + Program.Teams[0][i].statBrief());
-                        Console.WriteLine();
                     }
+                    Console.WriteLine();
                 }
 
             }
@@ -441,12 +468,11 @@ using System.Threading.Tasks;
 
         /// <summary>
         /// Ai chooses their target
-        /// if one team member is defending another then choosing 
-        /// the member the're defending forces them to attack the defender
-        /// if they're a mage then they'll have a 75% chance to heal allies with 20% health or less.
+        /// if they're a mage then they'll have a 75% chance to heal allies with 20% health or less. They also have a 20% to pass their turn.
         /// if they're a paladin then they'll have a 85% to defend for a rogue or mage.
         /// if they're a warrior then they have a 50% to defend for a rogue or mage.
         /// if they're a rogue then they'll attack regardless, rogues are pricks.
+        /// default behavior is just to attack the lowest health target
         /// </summary>
         void AIcombat()
         {
@@ -483,6 +509,19 @@ using System.Threading.Tasks;
        public void dealdamage(int attacker, int target, int attackerTeamNumber, int defenderTeamNumber)
        {
            int damage;
+           Console.Clear();
+           //check if the target is being defended by another, then retarget the defender
+           if (Program.Teams[defenderTeamNumber][target].defended)
+           {
+               Console.WriteLine("{0} ATTACKS {1}...", Program.Teams[attackerTeamNumber][attacker].statBrief(), Program.Teams[defenderTeamNumber][target].statBrief());
+               Console.WriteLine();
+               System.Threading.Thread.Sleep(500);
+               Console.WriteLine("BUT {0} INTERCEPTS THEIR ATTACK!", Program.Teams[defenderTeamNumber][Program.Teams[defenderTeamNumber][target].defender].statBrief());
+               Console.WriteLine();
+               System.Threading.Thread.Sleep(1000);
+               target = Program.Teams[defenderTeamNumber][target].defender;
+           }
+           //otherwise continue as normal
            Console.WriteLine("{0} ATTACKS {1}...", Program.Teams[attackerTeamNumber][attacker].statBrief(), Program.Teams[defenderTeamNumber][target].statBrief());
            Console.WriteLine();
            System.Threading.Thread.Sleep(500);
@@ -535,8 +574,10 @@ using System.Threading.Tasks;
                }
            }
 
-
+           //the target receives the damage
            Program.Teams[defenderTeamNumber][target].takedamage(damage);
+           Program.pressToContinue();
+
            if (isEveryoneDead(defenderTeamNumber))
            {
                Console.WriteLine();
@@ -557,6 +598,7 @@ using System.Threading.Tasks;
             if (healer == target)
             {
                 Console.WriteLine("{0} HEALS [SELF]", Program.Teams[healerTeam][healer].statBrief());
+                Console.WriteLine();
             }
             else
             {
@@ -607,6 +649,7 @@ using System.Threading.Tasks;
                    Program.Teams[teamIndex][defendTarget].defended = true;
                    Program.Teams[teamIndex][defendTarget].defender = defender;
                }
+               System.Threading.Thread.Sleep(500);
            }
 
        }
