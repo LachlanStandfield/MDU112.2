@@ -286,14 +286,12 @@ class Program
         Console.WriteLine(" --BATTLE TEST--");
         Console.WriteLine();
         //combat tests
-        for (int i = 0; i < 50; i++)
-        {
-            Combatphase.dealdamage( rng(1,numberOfPlayers), rng(1, numberOfPlayers),0,1);
-            Combatphase.heal( rng(0, Convert.ToInt32(numberOfPlayers)), rng(0, Convert.ToInt32(numberOfPlayers)),1);
-            Combatphase.dealdamage(rng(1, numberOfPlayers), rng(1, numberOfPlayers), 1, 0);
-            Combatphase.heal(rng(0, Convert.ToInt32(numberOfPlayers)), rng(0, Convert.ToInt32(numberOfPlayers)), 0);
+        //for (int i = 0; i < 50; i++)
+        //{
+        //    Combatphase.dealdamage( rng(1,numberOfPlayers), rng(1, numberOfPlayers),0,1);
+        //    Combatphase.dealdamage(rng(1, numberOfPlayers), rng(1, numberOfPlayers), 1, 0);
             
-        }
+       // }
 
     }
 
@@ -305,7 +303,7 @@ class Program
         Team1.Add(new Character() { characterID = 1, characterName = "[TEST TANK]", Job = 0, XP = testXP, teamName = team1Name  });
         Team1.Add(new Character() { characterID = 2, characterName = "[TEST WARRIOR]", Job = 1, XP = testXP, teamName = team1Name});
         Team1.Add(new Character() { characterID = 3, characterName = "[TEST ROGUE]", Job = 2, XP = testXP, teamName = team1Name });
-        Team1.Add(new Character() { characterID = 4, characterName = "[TEST MAGE]", Job = 3, XP = testXP, teamName = team1Name, defender = 0, defended= true });
+        Team1.Add(new Character() { characterID = 4, characterName = "[TEST MAGE]", Job = 3, XP = testXP, teamName = team1Name, });
         Team1[0].Levelup();
         Team1[1].Levelup();
         Team1[2].Levelup();

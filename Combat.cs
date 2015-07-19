@@ -211,6 +211,7 @@ using System.Threading.Tasks;
             //attack
             if (input == 1)
             {
+                Console.WriteLine();
                 Console.WriteLine("SELECT TARGET TO ATTACK");
                 Console.WriteLine();
                 for (int i = 0; i < Program.Teams[1].Count; i++)
@@ -241,18 +242,10 @@ using System.Threading.Tasks;
             //heal
             if (input == 2)
             {
-                Console.WriteLine("SELECT TARGET TO HEAL");
                 Console.WriteLine();
-                for (int i = 0; i < Program.Teams[0].Count; i++)
-                {
-            
-                    if (Program.Teams[0][i].isDead == false)
-                    {
-                        Console.WriteLine((i + 1) + ". " + Program.Teams[0][i].statBrief());
-                        Console.WriteLine();
-                    }
-
-                }
+                Console.WriteLine("SELECT ALLY TO HEAL");
+                Console.WriteLine();
+                listAllies(playerIndex);
                 actionInput = checkNumberAnswer();
                 if (checkInvalidTarget(actionInput, 0, playerIndex))
                 {
@@ -266,6 +259,18 @@ using System.Threading.Tasks;
             //defend
             if (input == 3)
             {
+                Console.WriteLine();
+                Console.WriteLine("SELECT ALLY TO DEFEND");
+                Console.WriteLine();
+                listAllies(playerIndex);
+                actionInput = checkNumberAnswer();
+                if (checkInvalidTarget(actionInput, 0, playerIndex))
+                {
+                    playerOptions(playerIndex);
+                    return;
+                }
+                defend(actionInput-1,playerIndex,0);
+                actionTaken = true;
 
             }
             //scan
@@ -300,10 +305,39 @@ using System.Threading.Tasks;
         {
 
         }
+
+        /// <summary>
+        /// checks if the player made an invalid input when selecting a target for attacking or healing
+        /// </summary>
+        /// <param name="actionInput"></param>
+        /// <param name="targetTeam"></param>
+        /// <param name="?"></param>
+        bool checkInvalidTarget(int actionInput, int targetTeam, int playerIndex)
+        {
+            bool invalidTarget = false;
+            if (actionInput < 1 || actionInput > Program.Teams[targetTeam].Count)
+            {
+                Console.WriteLine();
+                Console.WriteLine("INVALID TARGET");
+                Program.pressToContinue();
+                Console.Clear();
+                invalidTarget = true;
+
+            }
+            else if (Program.Teams[targetTeam][actionInput - 1].isDead == true)
+            {
+                Console.WriteLine();
+                Console.WriteLine("INVALID TARGET");
+                Program.pressToContinue();
+                Console.Clear();
+                invalidTarget = true;
+            }
+            return invalidTarget;
+        }
         
 
         /// <summary>
-        /// Scan Enemies and allies for detailed information
+        /// Scan Enemies and allies for detailed information, only applies to players
         /// </summary>
         /// <param name="playerIndex"></param>
         void scan(int playerIndex)
@@ -316,8 +350,16 @@ using System.Threading.Tasks;
                 {
                     if (Program.Teams[0][i].isDead == false)
                     {
-                        Console.WriteLine((i + 1) + ". " + Program.Teams[0][i].statBrief());
-                        Console.WriteLine();
+                        if (i == playerIndex)
+                        {
+                            Console.WriteLine((i + 1) + ". [SELF]");
+                            Console.WriteLine();
+                        }
+                        else
+                        {
+                            Console.WriteLine((i + 1) + ". " + Program.Teams[0][i].statBrief());
+                            Console.WriteLine();
+                        }
                     }
                 }
             //duplicate code, not sure how to fix this one.
@@ -370,37 +412,32 @@ using System.Threading.Tasks;
             }
             Program.pressToContinue();
             Console.Clear();
-            playerOptions(playerIndex);
 
         }
         /// <summary>
-        /// checks if the player made an invalid input when selecting a target for attacking or healing
+        /// List player allies
         /// </summary>
-        /// <param name="actionInput"></param>
-        /// <param name="targetTeam"></param>
-        /// <param name="?"></param>
-        bool checkInvalidTarget(int actionInput, int targetTeam, int playerIndex)
+        void listAllies(int playerIndex)
         {
-            bool invalidTarget = false;
-            if (actionInput < 1 || actionInput > Program.Teams[targetTeam].Count)
+            for (int i = 0; i < Program.Teams[0].Count; i++)
             {
-                Console.WriteLine();
-                Console.WriteLine("INVALID TARGET");
-                Program.pressToContinue();
-                Console.Clear();
-                invalidTarget = true;
+
+                if (Program.Teams[0][i].isDead == false)
+                {
+                    if (i == playerIndex)
+                    {
+                        Console.WriteLine((i + 1) + ". [SELF]");
+                    }
+                    else
+                    {
+                        Console.WriteLine((i + 1) + ". " + Program.Teams[0][i].statBrief());
+                        Console.WriteLine();
+                    }
+                }
 
             }
-            else if (Program.Teams[targetTeam][actionInput - 1].isDead == true)
-            {
-                Console.WriteLine();
-                Console.WriteLine("INVALID TARGET");
-                Program.pressToContinue();
-                Console.Clear();
-                invalidTarget = true;
-            }
-            return invalidTarget;
         }
+
 
         /// <summary>
         /// Ai chooses their target
@@ -500,6 +537,11 @@ using System.Threading.Tasks;
 
 
            Program.Teams[defenderTeamNumber][target].takedamage(damage);
+           if (isEveryoneDead(defenderTeamNumber))
+           {
+               Console.WriteLine();
+               Console.WriteLine("{0} HAVE BEEN COMPLETEY DEFEATED BY {1}", Program.Teams[defenderTeamNumber][0].teamName, Program.Teams[attackerTeamNumber][0].teamName);
+           }
            System.Threading.Thread.Sleep(500);
        }
 
@@ -509,14 +551,65 @@ using System.Threading.Tasks;
         /// <summary>
         /// apply healing to target
         /// </summary>
-        public void heal(int target, int healer,int healerTeam)
+       void heal(int target, int healer,int healerTeam)
         {
+
+            if (healer == target)
+            {
+                Console.WriteLine("{0} HEALS [SELF]", Program.Teams[healerTeam][healer].statBrief());
+            }
+            else
+            {
                 Console.WriteLine("{0} HEALS {1}", Program.Teams[healerTeam][healer].statBrief(), Program.Teams[healerTeam][target].statBrief());
                 Console.WriteLine();
+            }
                 System.Threading.Thread.Sleep(500);
                 Program.Teams[healerTeam][target].receiveHeal(Program.Teams[healerTeam][healer].characterHeal());
+            
 
         }
+        /// <summary>
+        /// Enter a defensive stance, Can defend self or stand infront of another character
+        /// doing so reduces the defended character's damage output
+        /// </summary>
+       void defend(int defendTarget, int defender, int teamIndex)
+       {
+           //if they're already defended , then they're an invalid target, they can be defending themself though
+           if (Program.Teams[teamIndex][defendTarget].defended)
+           {
+               //checks to see if it's the player, MIGHT CHANGE THIS IF I CAN GET BOTH TEAMS TO USE AI
+               if (teamIndex == 0)
+               {
+                   Console.WriteLine("INVALID TARGET");
+                   playerOptions(defender);
+                   return;
+               }
+                   //if they're an ai then return to the ai programming, this probably won't happen THOUGH as the ai program won't pick a defended target SO COME BACK AND FIX IT
+               else
+               {
+
+               }
+
+           }
+           else
+           {
+               if (defender == defendTarget)
+               {
+                   Console.WriteLine();
+                   Console.WriteLine("{0} ENTERS A DEFENSIVE STANCE", Program.Teams[teamIndex][defender].statBrief());
+                   Program.Teams[teamIndex][defender].defending = true;
+               }
+               else
+               {
+                   Console.WriteLine();
+                   Console.WriteLine("{0} ENTERS A DEFENSIVE STANCE IN FRONT OF {1}", Program.Teams[teamIndex][defender].statBrief(), Program.Teams[teamIndex][defendTarget].statBrief());
+                   Program.Teams[teamIndex][defender].defending = true;
+                   Program.Teams[teamIndex][defendTarget].defended = true;
+                   Program.Teams[teamIndex][defendTarget].defender = defender;
+               }
+           }
+
+       }
 
 
 

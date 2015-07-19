@@ -133,12 +133,16 @@ using System.Threading.Tasks;
 
            //if they're being defended by somone then print their stats too
            if (defended == true)
-           {
-               Console.Write("DEFENDED BY ");
-               Console.Write(Program.Team1[defender].statBrief());
-               Console.WriteLine();
-               Console.WriteLine();
-           }
+               //makes sure they're not defending themself
+               if (defender != characterID - 1)
+               {
+                   {
+                       Console.Write("DEFENDED BY ");
+                       Console.Write(Program.Team1[defender].statBrief());
+                       Console.WriteLine();
+                       Console.WriteLine();
+                   }
+               }
 
 
 
@@ -199,6 +203,7 @@ using System.Threading.Tasks;
 
        /// <summary>
        /// calculate base damage by multiplying strength by 4. seperates mages from other classes, as they use their int stat to deal damage
+       /// if the character is being defended then their damage is halved
        /// </summary>
        /// <returns></returns>
        public int characterDamage()
@@ -211,6 +216,10 @@ using System.Threading.Tasks;
            else
            {
                damage = str * 4;
+           }
+           if (defended)
+           {
+               damage /= 2;
            }
            return damage;
        }
