@@ -62,6 +62,8 @@ using System.Threading.Tasks;
 
         //combat variables, used for whether their in a  defensive postion or wheather another player is defending them
        //defensive stance lasts until this character's next turn
+       int defenceArmour;
+       int defenceBlock;
        public bool defending = false;
        public bool defended = false;
        public int defender;
@@ -77,7 +79,13 @@ using System.Threading.Tasks;
 
        public string statBrief()
        {
-           return characterName + " THE " + jobNames[Job] + " " + HP + "/" + maxHealth;
+           string brief;
+           brief = characterName + " THE " + jobNames[Job] + " " + HP + "/" + maxHealth;
+           if (defending == true)
+           {
+               brief = brief + " <DEFENDING>";
+           }
+           return brief; 
        }
 
 
@@ -105,10 +113,23 @@ using System.Threading.Tasks;
            Console.WriteLine("        STAMINA " + stam);
            Console.WriteLine("      DEXTERITY " + dex);
            Console.WriteLine("      INTELLECT " + intel);
-           Console.WriteLine("----------------------------");
-           Console.WriteLine("CRIT {0}% BLOCK {1}% ARMOUR {2}%",critchance,blockchance,armour);
-           Console.WriteLine("----------------------------");
-           Console.WriteLine();
+           if (defending == true)
+           {
+               defenceCalc();
+               Console.WriteLine("----------------------------");
+               Console.WriteLine("      --DEFENDING--");
+               Console.WriteLine("----------------------------");
+               Console.WriteLine("CRIT {0}% BLOCK {1}% ARMOUR {2}%", critchance, defenceBlock, defenceArmour);
+               Console.WriteLine("----------------------------");
+               Console.WriteLine();
+           }
+           else
+           {
+               Console.WriteLine("----------------------------");
+               Console.WriteLine("CRIT {0}% BLOCK {1}% ARMOUR {2}%", critchance, blockchance, armour);
+               Console.WriteLine("----------------------------");
+               Console.WriteLine();
+           }
 
            //if they're being defended by somone then print their stats too
            if (defended == true)
@@ -122,7 +143,23 @@ using System.Threading.Tasks;
 
 
        }
-
+       /// <summary>
+       /// calculate the stats for a character whilest they defend
+       /// these are only used to print the values at the moment
+       /// </summary>
+       void defenceCalc()
+       {
+           defenceArmour = armour * 2;
+           defenceBlock = blockchance * 2;
+               if (defenceBlock > 80)
+               {
+                   defenceBlock = 80;
+               }
+               if (defenceArmour > 90)
+               {
+                   defenceArmour = 90;
+               }
+       }
 
        /// <summary>
        /// Receive healing, if they're a tank then they receive less
@@ -139,6 +176,7 @@ using System.Threading.Tasks;
                HP = maxHealth;
            }
            Console.WriteLine("{0} RECEIVES {1} HEALTH",characterName,healAmount);
+           Console.WriteLine();
            System.Threading.Thread.Sleep(500);
        }
 
@@ -191,8 +229,8 @@ using System.Threading.Tasks;
                HP = 0;
                System.Threading.Thread.Sleep(500);
                Console.Write(characterName + " HAS BEEN DESTROYED!");
+               Console.WriteLine();
                isDead = true;
-               Program.pressToContinue();
                Console.WriteLine();
            }
        }

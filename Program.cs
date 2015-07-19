@@ -274,6 +274,8 @@ class Program
             Teams[0][i].isDead = true;
         }
         Teams[0][1].isDead = false;
+        Teams[0][3].isDead = false;
+        Teams[1][2].defending = true;
         Teams[1][1].defender = 2;
         Teams[1][1].defended = true;
         Combatphase.turnOrderPrint();
@@ -286,8 +288,10 @@ class Program
         //combat tests
         for (int i = 0; i < 50; i++)
         {
-            Combatphase.dealdamage( rng(0, Convert.ToInt32(numberOfPlayers)), rng(0, Convert.ToInt32(numberOfPlayers)),rng(0,1),rng(0,1));
-            Combatphase.heal( rng(0, Convert.ToInt32(numberOfPlayers)), rng(0, Convert.ToInt32(numberOfPlayers)),rng(0,1));
+            Combatphase.dealdamage( rng(1,numberOfPlayers), rng(1, numberOfPlayers),0,1);
+            Combatphase.heal( rng(0, Convert.ToInt32(numberOfPlayers)), rng(0, Convert.ToInt32(numberOfPlayers)),1);
+            Combatphase.dealdamage(rng(1, numberOfPlayers), rng(1, numberOfPlayers), 1, 0);
+            Combatphase.heal(rng(0, Convert.ToInt32(numberOfPlayers)), rng(0, Convert.ToInt32(numberOfPlayers)), 0);
             
         }
 

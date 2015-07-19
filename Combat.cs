@@ -54,15 +54,6 @@ using System.Threading.Tasks;
         }
 
 
-
-        public void testRemove()
-        {
-            turns[0] = 33;
-            turns[1] = 33;
-
-        }
-
-
         /// <summary>
         /// prints turn order
         /// </summary>
@@ -88,12 +79,6 @@ using System.Threading.Tasks;
             }
 
         }
-
-
-
-
-
-
 
 
         /// <summary>
@@ -206,6 +191,8 @@ using System.Threading.Tasks;
 
         public void playerOptions(int playerIndex)
         {
+            int actionInput;
+            bool actionTaken = false;
             Console.WriteLine( Program.Team1[playerIndex].statBrief()+" - TURN -");
             Console.WriteLine();
             //Console.WriteLine("{1} {0} -TURN-",Program.Team1[playerIndex].jobNames[Program.Team1[playerIndex].Job],Program.Team1[playerIndex].characterName);
@@ -216,19 +203,113 @@ using System.Threading.Tasks;
             if (input < 1 || input > 6)
             {
                 Console.WriteLine("INVALID COMMAND");
+                Program.pressToContinue();
+                Console.Clear();
                 playerOptions(playerIndex);
                 return;
             }
+            //attack
+            if (input == 1)
+            {
+                Console.WriteLine("SELECT TARGET TO ATTACK");
+                Console.WriteLine();
+                for (int i = 0; i < Program.Teams[1].Count; i++)
+                {
+            
+                    if (Program.Teams[1][i].isDead == false)
+                    {
+                        Console.WriteLine();
+                        Console.Write((i + 1) + ". " + Program.Teams[1][i].statBrief());
+                        if (Program.Teams[1][i].defended == true)
+                        {
+                            Console.Write(" << DEFENDED BY " + Program.Teams[1][Program.Teams[1][i].defender].statBrief());
+                        }
+                        Console.WriteLine();
+                    }
+
+                }
+                actionInput = checkNumberAnswer();
+                dealdamage(playerIndex, actionInput - 1, 0, 1);
+                actionTaken = true;
+
+            }
+            //heal
+            if (input == 2)
+            {
+                Console.WriteLine("SELECT TARGET TO HEAL");
+                Console.WriteLine();
+                for (int i = 0; i < Program.Teams[0].Count; i++)
+                {
+            
+                    if (Program.Teams[0][i].isDead == false)
+                    {
+                        Console.WriteLine((i + 1) + ". " + Program.Teams[0][i].statBrief());
+                        Console.WriteLine();
+                    }
+
+                }
+                actionInput = checkNumberAnswer();
+                if (actionInput < 1 || actionInput > Program.Teams[0].Count)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("INVALID TARGET");
+                    Program.pressToContinue();
+                    Console.Clear();
+                    playerOptions(playerIndex);
+                    return;
+
+                }
+                if (Program.Teams[0][actionInput - 1].isDead == true)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("INVALID TARGET");
+                    Program.pressToContinue();
+                    Console.Clear();
+                    playerOptions(playerIndex);
+                    return;
+                }
+                heal(actionInput - 1, playerIndex, 0);
+                actionTaken = true;
+
+            }
+            //defend
+            if (input == 3)
+            {
+
+            }
+            //scan
             if (input == 4)
             {
                 scan(playerIndex);
+            }
+            //hold
+            if (input == 5)
+            {
+                hold(playerIndex);
+            }
+            //turnorder
+            if (input == 6)
+            {
+                turnOrderPrint();
+            }
+            if (actionTaken == true)
+            {
+
+            }
+            else
+            {
+                playerOptions(playerIndex);
+                return;
             }
             
 
         }
 
+        void hold(int playerIndex)
+        {
 
-
+        }
+        
 
         /// <summary>
         /// Scan Enemies and allies for detailed information
@@ -240,26 +321,30 @@ using System.Threading.Tasks;
             Console.WriteLine();
             Console.WriteLine("SELECT TARGET TO SCAN");
             Console.WriteLine();
-            for (int i = 0; i < Program.Teams[0].Count; i++)
-            {
-                if (Program.Teams[0][i].isDead == false)
+                for (int i = 0; i < Program.Teams[0].Count; i++)
                 {
-                    Console.WriteLine((i + 1) + ". " + Program.Teams[0][i].statBrief());
+                    if (Program.Teams[0][i].isDead == false)
+                    {
+                        Console.WriteLine((i + 1) + ". " + Program.Teams[0][i].statBrief());
+                        Console.WriteLine();
+                    }
                 }
-            }
-            //duplicate code, must place teams in a nested array to fix this
-            for (int i = 0; i < Program.Team1.Count; i++)
+            //duplicate code, not sure how to fix this one.
+            for (int i = 0; i < Program.Teams[1].Count; i++)
             {
                 if (Program.Teams[1][i].isDead == false)
                 {
                     Console.WriteLine((i + 1 + Program.Team1.Count) + ". " + Program.Teams[1][i].statBrief());
+                    Console.WriteLine();
                 }
             }
             selection = checkNumberAnswer() - 1;
             Console.WriteLine("SCANNING...");
             if (selection < 0 || selection > Program.numberOfPlayers * 2 - 1)
             {
+                Console.WriteLine();
                 Console.WriteLine("INVALID TARGET");
+                Console.WriteLine();
             }
             else
             {
@@ -271,7 +356,9 @@ using System.Threading.Tasks;
                     }
                     else
                     {
+                        Console.WriteLine();
                         Console.WriteLine("INVALID TARGET");
+                        Console.WriteLine();
                     }
                 }
                 else
@@ -282,7 +369,9 @@ using System.Threading.Tasks;
                     }
                     else
                     {
+                        Console.WriteLine();
                         Console.WriteLine("INVALID TARGET");
+                        Console.WriteLine();
                     }
 
                 }
@@ -340,7 +429,6 @@ using System.Threading.Tasks;
        public void dealdamage(int attacker, int target, int attackerTeamNumber, int defenderTeamNumber)
        {
            int damage;
-           Console.WriteLine();
            Console.WriteLine("{0} ATTACKS {1}...", Program.Teams[attackerTeamNumber][attacker].statBrief(), Program.Teams[defenderTeamNumber][target].statBrief());
            Console.WriteLine();
            System.Threading.Thread.Sleep(500);
@@ -373,11 +461,21 @@ using System.Threading.Tasks;
                //check the attacker ins't a mage, if they aren't then apply armour
                if (Program.Teams[attackerTeamNumber][attacker].Job != 3)
                {
-                   decimal armour = 1 - Convert.ToDecimal(Program.Teams[defenderTeamNumber][target].armour) / 100;
-                   //if they*'re defending then the armour value is doubled
-                   if (Program.Teams[defenderTeamNumber][target].defending == true)
+                   decimal armour;
+                   if (Program.Teams[defenderTeamNumber][target].defending == false)
                    {
-                       armour -= Convert.ToDecimal(Program.Teams[defenderTeamNumber][target].armour) / 100;
+                       armour = 1 - Convert.ToDecimal(Program.Teams[defenderTeamNumber][target].armour) / 100;
+                   }
+                   //if they're defending then the armour value is doubled
+                   else
+                   {
+                       armour = Convert.ToDecimal(Program.Teams[defenderTeamNumber][target].armour);
+                       //armour can't be higher than 90%
+                       if (armour > 90)
+                       {
+                           armour = 90;
+                       }
+                       armour /= 100;
                    }
                    damage = Convert.ToInt32(Convert.ToDecimal(damage) * armour);
                }
