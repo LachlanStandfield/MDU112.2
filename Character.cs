@@ -30,10 +30,10 @@ using System.Threading.Tasks;
         //1)Paladin   2)Warrior  3)Rogue  4) Mage
         //add additional class by increasing array sizes, might put these into their own class later and make a list
         //stats used when leveling up, these are affected by character job, 
-        int[] strgrowth= new int[4]   {4,16,6,1};
-        int[] stamgrowth = new int[4] {22,9,5,8};
-        int[] dexgrowth = new int[4]  {6,9,15,6};
-        int[] intelgrowth = new int[4]{5,2,6,17};
+        int[] strgrowth= new int[4]   {5,16,6,0};
+        int[] stamgrowth = new int[4] {23,8,4,5};
+        int[] dexgrowth = new int[4]  {4,9,18,6};
+        int[] intelgrowth = new int[4]{5,2,6,19};
 
         //base values for critical strike, armour(damage reduction) and block, these are then altered slightly based on character level and on dexterity/intellect, stamina/strength and srength/dexterity stats repsectively
         int[] critbase = new int[4] {1,5,40,10};

@@ -581,7 +581,7 @@ using System.Threading.Tasks;
 
         /// <summary>
         /// Ai chooses their target
-        /// if they're a mage then they'll have a 50% chance to heal  the lowest health ally. They also have a 20% to pass their turn.
+        /// if they're a mage then they'll have a 30% chance to heal  the lowest health ally. They also have a 15% to pass their turn.
         /// if they're a tank then they'll have a 85% to defend for a rogue or mage.
         /// if they're a warrior then they have a 40% to defend for a rogue or mage.
         /// if they're a rogue then they'll attack regardless, rogues are pricks.
@@ -623,9 +623,9 @@ using System.Threading.Tasks;
             //mage specific
             if (Program.Teams[1][botID].Job == 3)
             {
-                aiBehaviorCheck = 50;
+                aiBehaviorCheck = 30;
                 //heal lowest health ally, randomise if some are on the same health
-                if (aiBehavior > aiBehaviorCheck)
+                if (aiBehavior < aiBehaviorCheck)
                 {
                     for (int i = 0; i < Program.numberOfPlayers; i++)
                     {
@@ -633,19 +633,17 @@ using System.Threading.Tasks;
                     }
                     checkLowestValue();
                     heal(aiIDValues[0], botID, 1);
+                    actionTaken = true;
                 }
-                aiBehaviorCheck = 20;
+                aiBehaviorCheck = 15;
                 if (aiBehavior < aiBehaviorCheck && actionTaken == false)
                 {
                     //pass turn
                     hold(botID, 1);
                     holding = true;
+                    actionTaken = true;
                 }
             }
-            //the default action if the class specific actions don't take place
-            else
-            {
-                //attack lowest health enemy
                 if (actionTaken == false)
                 {
                     for (int i = 0; i < Program.numberOfPlayers; i++)
@@ -655,7 +653,6 @@ using System.Threading.Tasks;
                     checkLowestValue();
                    dealdamage(botID,aiIDValues[0],1,0);
                 }
-            }
 
             Console.WriteLine("END OF LINE");
             Program.pressToContinue();
@@ -663,6 +660,8 @@ using System.Threading.Tasks;
             nextTurn(holding);
             return;
         }
+
+
         /// <summary>
         /// used yb the ai to find  low health targets
         /// </summary>
