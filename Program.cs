@@ -282,21 +282,24 @@ class Program
 
     void testMen()
     {
-        int testXP = 100;
-        numberOfPlayers = 4;
+        int testXP = 1000;
+        numberOfPlayers = 5;
         team1Name = "[TEAM TESTER]";
         Team1.Add(new Character() { characterID = 1, characterName = "[TEST TANK]", Job = 0, XP = testXP, teamName = team1Name  });
         Team1.Add(new Character() { characterID = 2, characterName = "[TEST WARRIOR]", Job = 1, XP = testXP, teamName = team1Name});
         Team1.Add(new Character() { characterID = 3, characterName = "[TEST ROGUE]", Job = 2, XP = testXP, teamName = team1Name });
         Team1.Add(new Character() { characterID = 4, characterName = "[TEST MAGE]", Job = 3, XP = testXP, teamName = team1Name, });
+        Team1.Add(new Character() { characterID = 5, characterName = "[TEST MAGE THE 2ND]", Job = 3, XP = testXP, teamName = team1Name, });
         Team1[0].Levelup();
         Team1[1].Levelup();
         Team1[2].Levelup();
         Team1[3].Levelup();
+        Team1[4].Levelup();
         Team1[0].PrintStats();
         Team1[1].PrintStats();
         Team1[2].PrintStats();
         Team1[3].PrintStats();
+        Team1[4].PrintStats();
     }
 
     static public void pressToContinue()

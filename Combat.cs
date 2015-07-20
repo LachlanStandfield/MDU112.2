@@ -14,6 +14,9 @@ using System.Threading.Tasks;
         int comabtlogTurnNumber;
         List<string> combatLog = new List<string>();
 
+        //lsit used for ai behavior
+        List<int> aiValues = new List<int>();
+        List<int> aiIDValues = new List<int>();
 
         Random r = new Random();
         /// <summary>
@@ -386,7 +389,7 @@ using System.Threading.Tasks;
             }
             else
             {
-                AIcombat(availableTurns[0]);
+                AIcombat(availableTurns[0]-Program.numberOfPlayers);
             }
         }
 
@@ -399,6 +402,16 @@ using System.Threading.Tasks;
         void hold(int playerIndex, int teamNumber)
         {
             List<int> tempTurns = new List<int>();
+            Console.WriteLine();
+            if (playerIndex > Program.numberOfPlayers - 1)
+            {
+                Console.WriteLine("{0} WAITS", Program.Teams[teamNumber][playerIndex-Program.numberOfPlayers].statBrief());
+            }
+            else
+            {
+                Console.WriteLine("{0} WAITS", Program.Teams[teamNumber][playerIndex].statBrief());
+            }
+            
             for (int i = 0; i < availableTurns.Count; i++)
             {
                 tempTurns.Add(availableTurns[i]);
@@ -568,17 +581,134 @@ using System.Threading.Tasks;
 
         /// <summary>
         /// Ai chooses their target
-        /// if they're a mage then they'll have a 75% chance to heal allies with 20% health or less. They also have a 20% to pass their turn.
-        /// if they're a paladin then they'll have a 85% to defend for a rogue or mage.
-        /// if they're a warrior then they have a 50% to defend for a rogue or mage.
+        /// if they're a mage then they'll have a 50% chance to heal  the lowest health ally. They also have a 20% to pass their turn.
+        /// if they're a tank then they'll have a 85% to defend for a rogue or mage.
+        /// if they're a warrior then they have a 40% to defend for a rogue or mage.
         /// if they're a rogue then they'll attack regardless, rogues are pricks.
         /// default behavior is just to attack the lowest health target
         /// </summary>
         void AIcombat(int botID)
         {
-            nextTurn(false);
-        }
+            bool holding = false;
+            //clear the value lists so they can be reassinged
+            aiValues.Clear();
+            aiIDValues.Clear();
+            bool actionTaken = false;
+            //generate the behavior value
+            int aiBehavior = rng(1,100);
+            //the value used to check which behavior the ai should perform
+            int aiBehaviorCheck;
 
+
+            //tank specific
+            if (Program.Teams[1][botID].Job == 0)
+            {
+                aiBehaviorCheck = 85;
+                if (aiBehavior < aiBehaviorCheck)
+                {
+                    //block for ally squishy
+                }
+
+            }
+            //warior specific
+            if (Program.Teams[1][botID].Job == 1)
+            {
+                aiBehaviorCheck = 40;
+                if (aiBehavior < aiBehaviorCheck)
+                {
+                    //block for ally squishy
+                }
+            }
+
+            //mage specific
+            if (Program.Teams[1][botID].Job == 3)
+            {
+                aiBehaviorCheck = 50;
+                //heal lowest health ally, randomise if some are on the same health
+                if (aiBehavior > aiBehaviorCheck)
+                {
+                    for (int i = 0; i < Program.numberOfPlayers; i++)
+                    {
+                         aiValues.Add( Program.Teams[1][i].HP);
+                    }
+                    checkLowestValue();
+                    heal(aiIDValues[0], botID, 1);
+                }
+                aiBehaviorCheck = 20;
+                if (aiBehavior < aiBehaviorCheck && actionTaken == false)
+                {
+                    //pass turn
+                    hold(botID, 1);
+                    holding = true;
+                }
+            }
+            //the default action if the class specific actions don't take place
+            else
+            {
+                //attack lowest health enemy
+                if (actionTaken == false)
+                {
+                    for (int i = 0; i < Program.numberOfPlayers; i++)
+                    {
+                         aiValues.Add( Program.Teams[0][i].HP);
+                    }
+                    checkLowestValue();
+                   dealdamage(botID,aiIDValues[0],1,0);
+                }
+            }
+
+            Console.WriteLine("END OF LINE");
+            Program.pressToContinue();
+            Console.Clear();
+            nextTurn(holding);
+            return;
+        }
+        /// <summary>
+        /// used yb the ai to find  low health targets
+        /// </summary>
+        void checkLowestValue()
+        {
+            //aiValues is assigned during the aiCombat method, this can represent the health of allies or enemies
+            //assigns the values from aiValues 1 to aiValues2, this is then used to find the lowest value
+            for (int i =0 ; i < aiValues.Count; i++){
+                aiIDValues.Add(i);
+            }
+            for (int i =0 ; i < aiValues.Count; i++){
+                int temp;
+                if (i+1 < aiValues.Count)
+                {
+                    if (aiValues[i] > aiValues[i+1])
+                    {
+                        temp = aiValues[i];
+                        aiValues[i] = aiValues[i+1];
+                        aiValues[i+1] = temp;
+                        temp = aiIDValues[i];
+                        aiIDValues[i] = aiIDValues[i+1];
+                        aiIDValues[i+1] = temp;
+                        if (i - 1 >= 0)
+                        {
+                            temp = aiValues[i-1];
+                            if (aiValues[i] < aiValues[i - 1])
+                            {
+                                aiValues[i - 1] = aiValues[i];
+                                aiValues[i] = temp;
+                                temp = aiIDValues[i - 1];
+                                aiIDValues[i - 1] = aiIDValues[i];
+                                aiIDValues[i] = temp;
+                            }
+                        }
+                    }
+
+                }
+                //remove 0 values as it means the target is dead
+                if (aiValues[0] == 0)
+                {
+                    aiValues.Remove(aiValues[0]);
+                    aiIDValues.Remove(aiIDValues[0]);
+                }
+
+            }
+        }
 
 
        /// <summary>
@@ -677,14 +807,12 @@ using System.Threading.Tasks;
 
            //the target receives the damage
            Program.Teams[defenderTeamNumber][target].takedamage(damage);
-           Program.pressToContinue();
 
            if (isEveryoneDead(defenderTeamNumber))
            {
                Console.WriteLine();
                Console.WriteLine("{0} HAVE BEEN COMPLETEY DEFEATED BY {1}", Program.Teams[defenderTeamNumber][0].teamName, Program.Teams[attackerTeamNumber][0].teamName);
            }
-           System.Threading.Thread.Sleep(500);
        }
 
 
