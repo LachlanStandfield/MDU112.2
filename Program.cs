@@ -3,35 +3,36 @@ using System.Collections.Generic;
     class Program
     {
 
-
+        //used in random number generator
         Random r = new Random();
 
+
+        //used for character teams, Team1 is the player, Team2 is the ai
         public static List<Character> Team1 = new List<Character>();
         public static List<Character> Team2 = new List<Character>();
         public static List<Character>[] Teams = new List<Character>[2] { Team1, Team2 };
 
-        //lists for Turn order
-        List<int> turn1 = new List<int>();
+        //list used for turn order
          List<Turns> availableTurns = new List<Turns>();
 
-
+        //used to define the team names
         string team1Name;
         string team2Name;
-        int assignID = 1;
+        
+        //defines the number of players per team
         public static int numberOfPlayers;
 
-        int turnCount = 1;
 
-        //COMBAT INFO VARIABLES
-        int comabtlogTurnNumber;
-        List<string> combatLog = new List<string>();
+        //used for printing the combat log
+        public static int comabtlogTurnNumber;
+        public static List<string> combatLog = new List<string>();
 
         //LISTS USED IN AI BEHAVIOR
         List<int> aiValues = new List<int>();
         List<int> aiIDValues = new List<int>();
         List<Health> aiHealthValues = new List<Health>();
 
-
+        //GENERIC METHODS
 
         ///<summary>
         ///RANDOM NUMBER GENERATOR
@@ -102,8 +103,62 @@ using System.Collections.Generic;
 
 
 
+
+        ///<summary>
+        //MAIN LOGIC
+        ///</summary>
+        public void Run()
+        {
+
+
+            //intro text
+            Console.WriteLine("WELCOME CHALLENGERS TO CYBER AREA 20XX 2: CLAN WARS");
+            System.Threading.Thread.Sleep(2000);
+            Console.WriteLine();
+            Console.WriteLine("IN THIS INTENSE COMBAT GAME YOU WILL FACE OFF AGAINST THE FEARCEST");
+            Console.WriteLine();
+            Console.WriteLine("TEAMS OF FIGHTERS FROM ACCROSS THE GALAXY");
+            System.Threading.Thread.Sleep(1200);
+            Console.WriteLine();
+            Console.WriteLine("REMEMBER THIS IS LIFE OR DEATH, IF A TEAM MEMBER GOES DOWN...");
+            System.Threading.Thread.Sleep(2000);
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine("THEN THEY'RE STAYING DOWN");
+            Console.WriteLine();
+            System.Threading.Thread.Sleep(2000);
+            choosePlayerNumber();
+            Console.WriteLine("BEGGINNING FIGHTER CREATION");
+            pressToContinue();
+            Console.Clear();
+            createPlayerCharacter();
+            Console.Clear();
+            Console.WriteLine();
+            Console.Write("FINDING OPPONENTS");
+            for (int i = 0; i < 4; i++)
+            {
+                System.Threading.Thread.Sleep(250);
+                Console.Write(".");
+            }
+            Console.WriteLine();
+            Console.WriteLine();
+            createEnemy();
+            pressToContinue();
+            Console.Clear();
+            Console.WriteLine("LET THE GAMES BEGIN!!!");
+            pressToContinue();
+            Console.Clear();
+            battle(false, false);
+            return;
+        }
+
+
+
+
+
+
         /// <summary>
-        /// CHOOSE NUMBER OF PLAYERS FOR EACH TEAM
+        /// PLAYER CHOOSES NUMBER OF PLAYERS FOR EACH TEAM 3-10
         /// </summary>
         void choosePlayerNumber()
         {
@@ -137,6 +192,7 @@ using System.Collections.Generic;
                 Console.WriteLine("TEAM NAME:");
                 team1Name = ("TEAM " + Console.ReadLine());
                 Console.WriteLine("SO YOUR TEAM IS CALLED {0}? Y/N", team1Name);
+                //checks for yes or no via method
                 valid = yesOrNo(Console.ReadLine());
             }
             valid = false;
@@ -148,9 +204,8 @@ using System.Collections.Generic;
                 Team1.Add(new Character());
                 valid = false;
                 Team1[counter].teamName = "[" + team1Name + "]";
-                Team1[counter].characterID = assignID;
+                Team1[counter].characterID = counter +1;
                 Team1[counter].TeamID = 0;
-                assignID++;
 
                 //asks for their name
                 while (valid == false)
@@ -160,7 +215,7 @@ using System.Collections.Generic;
                     Console.WriteLine(Team1[counter].characterName + ", REGISTERED. PROCEED? Y/N");
 
                     valid = yesOrNo(Console.ReadLine());
-
+                    Console.Clear();
                 }
                 valid = false;
 
@@ -168,7 +223,15 @@ using System.Collections.Generic;
                 while (valid == false)
                 {
                     Console.WriteLine("CHOOSE " + Team1[counter].characterName + "'S JOB");
-                    Console.WriteLine("0. {0}    1. {1}   2. {2}   3. {3}", Team1[0].jobNames[0], Team1[0].jobNames[1], Team1[0].jobNames[2], Team1[0].jobNames[3]);
+                    Console.WriteLine();
+                    Console.WriteLine("0. {0} - A DAMAGE SOAKER, GOOD AT DEFENDING THEIR ALLIES", Team1[0].jobNames[0]);
+                    Console.WriteLine();
+                    Console.WriteLine("1. {0} - A BRAWLER, CAN DEFEND THEIR ALLIES IN A PINCH BUT PREFER TO RUSH THE BACKLINE",Team1[0].jobNames[1]);
+                    Console.WriteLine();
+                    Console.WriteLine("2. {0} - AN ASSASSIN, HIGH CRITICAL CHANCE SPELLS DEATH FOR THEIR ENEMIES",Team1[0].jobNames[2]);
+                    Console.WriteLine();
+                    Console.WriteLine("3. {0} - A STRATEGIST, HEALS ALLIES AND IGNORES ENEMY ARMOUR",Team1[0].jobNames[3]);
+                    Console.WriteLine();
                     Team1[counter].Job = checkNumberAnswer();
                     if (Team1[counter].Job > 3)
                     {
@@ -176,6 +239,7 @@ using System.Collections.Generic;
                     }
                     Console.WriteLine(Team1[counter].jobNames[Team1[counter].Job] + ", REGISTERED. PROCEED? Y/N");
                     valid = yesOrNo(Console.ReadLine());
+                    Console.Clear();
                 }
                 valid = false;
 
@@ -185,6 +249,7 @@ using System.Collections.Generic;
                 {
                     Console.Clear();
                     Console.WriteLine();
+                    //pauses for a second while generating, this was an aesthetic choice
                     Console.Write("GENERATING FIGHTER");
                     for (int i = 0; i < 4; i++)
                     {
@@ -193,8 +258,10 @@ using System.Collections.Generic;
                     }
                     Console.WriteLine();
                     Console.WriteLine();
+                    //sets the characters level to 0 then awards them with 100 xp
                     Team1[counter].level = 0;
                     Team1[counter].XP += 100;
+                    //levels the character iup, giving them their stats
                     Team1[counter].Levelup();
                     Team1[counter].PrintStats();
                     Console.WriteLine();
@@ -211,6 +278,7 @@ using System.Collections.Generic;
 
             }
             Console.Clear();
+            //prints stats
             for (int count = 1; count < numberOfPlayers; count++)
             {
                 Team1[count].PrintStats();
@@ -224,19 +292,20 @@ using System.Collections.Generic;
         /// </summary>
         public void createEnemy()
         {
+            //random name arrays 
             string[] randomName = new string[16] { "SLAB", "SLATE", "SMASH", "JOHN", "HUNK", "FLINT", "CHUNKY", "CHAD", "BIG", "BOB", "BLAST","DIRK","BRICK","BEAT","STOMP","DIO" };
             string[] randomTitle = new string[16] { "BULKHEAD", "McLARGEHUGE", "SQUATTHRUST", "SLAMCHEST", "HARDPEC", "DEADLIFT", "CHESTHAIR", "McRUNFAST", "CHUNKMAN", "BEEFKNOB","JOHNSON","BRANDO","STEAKFIST","LARGEMEAT","PUNCHBEEF","CENA" };
             string[] randomTeamName = new string[12] { "KILLER", "SANDY", "SALTY", "SEXUAL", "ANGRY", "SILENT", "MEN", "KILLERS", "RASCALS", "GENTLEMEN", "FREAKS", "BOYS" };
-
+            //generates random name from first two arrays, and tema naem from the third one
             team2Name = "[THE " + randomTeamName[rng(0, randomTeamName.Length / 2)] + " " + randomTeamName[rng(randomTeamName.Length / 2, randomTeamName.Length)] + "]";
             for (int count = 0; count < numberOfPlayers; count++)
             {
                 //create random character
                 Teams[1].Add(new Character() { characterName = "[" + (randomName[rng(0, (randomName.Length))] + " " + randomTitle[rng(0, (randomTitle.Length))] + "]"), Job = rng(0, 4), TeamID = 1 });
                 Teams[1][count].teamName = team2Name;
-                Teams[1][count].characterID = assignID;
-                assignID++;
-                Teams[1][count].XP = rng(1,200)+Team1[count].level * 100 -100;
+                Teams[1][count].characterID = count+1+numberOfPlayers;
+                //generates levels based on player levels
+                Teams[1][count].XP = rng(1,20)+ +Team1[0].XP+(Team1[0].level * 100);
                 Teams[1][count].Levelup();
 
                 //announce them
@@ -258,9 +327,10 @@ using System.Collections.Generic;
             Console.WriteLine("        TURN ORDER");
             Console.WriteLine("---------------------------");
             Console.WriteLine();
+            //updates to see who's dead
             updateTurnOrder();
 
-
+            //depending on wether they are an ai or a player character the index for printing has to be altered
             for (int i = 0; i < availableTurns.Count; i++)
             {
                 if (availableTurns[i].ID <  numberOfPlayers)
@@ -289,19 +359,20 @@ using System.Collections.Generic;
             availableTurns.Clear();
             for (int j = 0; j < Teams.Length; j++)
             {
+                //generates a number which is a random of 0-500 + a random of 0 to the characters dextertiy and assigns it to their priority
                 for (int i = 0; i < Teams[j].Count; i++)
                 {
                     if (j == 0)
                     {
-                        availableTurns.Add(new Turns() {ID = i, priority = (rng(1,1000)+rng(0,Teams[j][i].dex))});
+                        availableTurns.Add(new Turns() {ID = i, priority = (rng(1,500)+rng(0,Teams[j][i].dex))});
                     }
                     else
                     {
-                        availableTurns.Add(new Turns() { ID = i+numberOfPlayers, priority = (rng(1, 1000) + rng(0, Teams[j][i].dex)) });
+                        availableTurns.Add(new Turns() { ID = i+numberOfPlayers, priority = (rng(1, 500) + rng(0, Teams[j][i].dex)) });
                     }
                 }
             }
-
+            //sorts the order by turn priority
             availableTurns.Sort((a, b) => a.priority.CompareTo(b.priority));  
         }
 
@@ -314,14 +385,14 @@ using System.Collections.Generic;
             {
                 if (availableTurns[i].ID < numberOfPlayers)
                 {
-                    if (Teams[0][availableTurns[i].ID].HP == 0)
+                    if (Teams[0][availableTurns[i].ID].isDead)
                     {
                         availableTurns.RemoveAt(i);
                     }
                 }
                 else
                 {
-                    if (Teams[1][availableTurns[i].ID - numberOfPlayers].HP == 0)
+                    if (Teams[1][availableTurns[i].ID - numberOfPlayers].isDead)
                     {
                         availableTurns.RemoveAt(i);
                     }
@@ -349,6 +420,7 @@ using System.Collections.Generic;
              Teams[0][playerIndex].defendingOther = false;
              Teams[0][playerIndex].defending = false;
              Teams[0][ Teams[0][playerIndex].defendedID].defended = false;
+            //this boolean tells whether the player chose to hold their turn
             bool holding = false;
             int actionInput;
             bool actionTaken = false;
@@ -358,6 +430,7 @@ using System.Collections.Generic;
             Console.WriteLine();
             Console.WriteLine("1. ATTACK  2. HEAL  3. DEFEND  4. SCAN 5. HOLD  6. TURN ORDER");
             int input = checkNumberAnswer();
+            // if they don't make a valid input then the'yr told it a bad number
             if (input < 1 || input > 6)
             {
                 Console.WriteLine("INVALID COMMAND");
@@ -377,6 +450,7 @@ using System.Collections.Generic;
 
                     if ( Teams[1][i].isDead == false)
                     {
+                        //prints a list of available targets to attack as well as whether they're being defended
                         Console.WriteLine();
                         Console.Write((i + 1) + ". " +  Teams[1][i].statBrief());
                         if ( Teams[1][i].defended == true)
@@ -400,6 +474,7 @@ using System.Collections.Generic;
             //heal
             if (input == 2)
             {
+                //prints a list of available allies to heal
                 Console.WriteLine();
                 Console.WriteLine("SELECT ALLY TO HEAL");
                 Console.WriteLine();
@@ -417,6 +492,7 @@ using System.Collections.Generic;
             //defend
             if (input == 3)
             {
+                //prints alist of available allies to defend
                 Console.WriteLine();
                 Console.WriteLine("SELECT ALLY TO DEFEND");
                 Console.WriteLine();
@@ -433,23 +509,24 @@ using System.Collections.Generic;
             }
             //scan
             if (input == 4)
-            {
+            {// prints stat information for a target
                 scan(playerIndex);
             }
             //hold
             if (input == 5)
-            {
+            {// holds until the last turn
                 hold(playerIndex, 0);
                 holding = true;
                 actionTaken = true;
             }
             //turnorder
             if (input == 6)
-            {
+            {//prints the turn order
                 turnOrderPrint();
             }
             if (actionTaken == true)
             {
+                //checks wether the player chose to hold then passes this information on o the next turn method
                 if (holding)
                 {
                      pressToContinue();
@@ -461,13 +538,13 @@ using System.Collections.Generic;
                 {
                     pressToContinue();
                     Console.Clear();
-                    turnCount++;
                     nextTurn(false,false);
                     return;
                 }
             }
             else
             {
+                //if the player didn't make a valid selection then they're presented with their options again
                 playerOptions(playerIndex);
                 Console.Clear();
                 return;
@@ -497,10 +574,11 @@ using System.Collections.Generic;
             Console.WriteLine("{0} ATTACKS {1}...",  Teams[attackerTeamNumber][attacker].statBrief(),  Teams[defenderTeamNumber][target].statBrief());
             Console.WriteLine();
             System.Threading.Thread.Sleep(500);
-            //checks if the target dodges and changes damage to 0
+            
             damage =  Team1[attacker].characterDamage();
             if ( Team1[attacker].crit() == true)
             {
+                //checks to see if thr attack is critical to deal bonus damage
                 Console.WriteLine("A CRITICAL HIT!");
                 Console.WriteLine();
                 System.Threading.Thread.Sleep(500);
@@ -508,6 +586,7 @@ using System.Collections.Generic;
             }
             if ( Teams[defenderTeamNumber][target].dodge() == true)
             {
+                //checks if the target dodges and changes damage to 0
                 Console.WriteLine("{0} DODGES IT!",  Teams[defenderTeamNumber][target].characterName);
                 Console.WriteLine();
                 System.Threading.Thread.Sleep(500);
@@ -542,11 +621,13 @@ using System.Collections.Generic;
 
             //the target receives the damage
              Teams[defenderTeamNumber][target].takedamage(damage);
-
+            //add to combat log
+            combatLog.Add(Teams[attackerTeamNumber][attacker].characterName+ " ATTACKED "+ Teams[defenderTeamNumber][target].characterName+ " FOR "+damage+".");
             if (isEveryoneDead(defenderTeamNumber))
             {
                 Console.WriteLine();
                 Console.WriteLine("{0} HAVE BEEN COMPLETEY DEFEATED BY {1}",  Teams[defenderTeamNumber][0].teamName,  Teams[attackerTeamNumber][0].teamName);
+                combatLog.Add(Teams[defenderTeamNumber][0].teamName + " WERE WIPED OUT.");
             }
         }
 
@@ -555,7 +636,7 @@ using System.Collections.Generic;
         /// </summary>
         void heal(int target, int healer, int healerTeam)
         {
-
+            //print list to be healed
             if (healer == target)
             {
                 Console.WriteLine("{0} HEALS [SELF]",  Teams[healerTeam][healer].statBrief());
@@ -565,10 +646,11 @@ using System.Collections.Generic;
             {
                 Console.WriteLine("{0} HEALS {1}",  Teams[healerTeam][healer].statBrief(),  Teams[healerTeam][target].statBrief());
                 Console.WriteLine();
-            }
+            }// heal the target
             System.Threading.Thread.Sleep(500);
-             Teams[healerTeam][target].receiveHeal( Teams[healerTeam][healer].characterHeal());
-
+            Teams[healerTeam][target].receiveHeal( Teams[healerTeam][healer].characterHeal());
+            //add to combat log
+            combatLog.Add(Teams[healerTeam][healer].characterName+" HEALED "+Teams[healerTeam][target].characterName+" FOR "+Teams[healerTeam][healer].characterHeal()+".");
 
         }
 
@@ -577,7 +659,7 @@ using System.Collections.Generic;
         /// </summary>
         void defend(int defendTarget, int defender, int teamIndex)
         {
-            //if they're already defended , then they're an invalid target, they can be defending themself though. You can't stack up defenders either.
+            //if the target is already defended , then they're an invalid target. targets can be defending themself though. You can't stack up defenders either.
             if ( Teams[teamIndex][defendTarget].defended == true ||  Teams[teamIndex][defendTarget].defendingOther == true ||  Teams[teamIndex][defender].defended == true)
             {
                 Console.WriteLine("INVALID TARGET");
@@ -587,15 +669,18 @@ using System.Collections.Generic;
 
             }
             else
-            {
+            {// if they only defend themself then they enter a defensive stance and set defending to true
                 if (defender == defendTarget)
                 {
                     Console.WriteLine();
                     Console.WriteLine("{0} ENTERS A DEFENSIVE STANCE",  Teams[teamIndex][defender].statBrief());
                      Teams[teamIndex][defender].defending = true;
+                    //add to comabt log
+                     combatLog.Add(Teams[teamIndex][defender].characterName+" DEFENDED.");
                 }
                 else
                 {
+                    // if they defend an ally then the defenders id as well as the defended targets id have to be recorded
                     Console.WriteLine();
                     Console.WriteLine("{0} ENTERS A DEFENSIVE STANCE IN FRONT OF {1}",  Teams[teamIndex][defender].statBrief(),  Teams[teamIndex][defendTarget].statBrief());
                      Teams[teamIndex][defender].defending = true;
@@ -603,6 +688,8 @@ using System.Collections.Generic;
                      Teams[teamIndex][defender].defendingOther = true;
                      Teams[teamIndex][defendTarget].defended = true;
                      Teams[teamIndex][defendTarget].defender = defender;
+                    //add to combat log
+                     combatLog.Add(Teams[teamIndex][defender].characterName + " DEFENDED " + Teams[teamIndex][defendTarget].characterName+".");
                 }
                 System.Threading.Thread.Sleep(500);
             }
@@ -709,6 +796,7 @@ using System.Collections.Generic;
         /// </summary>
         void hold(int playerIndex, int teamNumber)
         {
+            // moves each part of the list upward one space
             List<int> tempTurns = new List<int>();
             Console.WriteLine();
             if (playerIndex >  numberOfPlayers - 1)
@@ -729,6 +817,8 @@ using System.Collections.Generic;
             {
                 availableTurns[i].ID = tempTurns[i + 1];
             }
+            //add to combat log
+            combatLog.Add(Teams[teamNumber][playerIndex].characterName + " WAITED.");
         }
 
         /// <summary>
@@ -787,10 +877,272 @@ using System.Collections.Generic;
 
 
 
+
+
+
+
+
+        /// <summary>
+        /// AI CODE
+        /// if they're a mage then they'll have a 30% chance to heal  the lowest health ally. They also have a 15% to pass their turn.
+        /// if they're a tank then they'll have a 70% to defend for a rogue or mage.
+        /// if they're a warrior then they have a 40% to defend for a rogue or mage.
+        /// if they're a rogue then they'll attack regardless, they're pricks.
+        /// default behavior is just to attack the lowest health target
+        /// </summary>
+        void AIcombat(int botID)
+        {
+            aiValues.Clear();
+            aiIDValues.Clear();
+            //turn off defending
+            if ( Teams[1][botID].defending)
+            {
+                Console.WriteLine("{0} STOPPED DEFENDING",  Teams[1][botID].characterName);
+            }
+             Teams[1][botID].defendingOther = false;
+             Teams[1][botID].defending = false;
+             Teams[1][ Teams[1][botID].defendedID].defended = false;
+            bool holding = false;
+            //clear the value lists so they can be reassinged*
+            bool actionTaken = false;
+            //generate the behavior value
+            int aiBehavior = rng(1, 100);
+            //the value used to check which behavior the ai should perform
+            int aiBehaviorCheck;
+
+
+            //tank specific
+            if ( Teams[1][botID].Job == 0)
+            {
+                aiBehaviorCheck = 70;
+                if (aiBehavior < aiBehaviorCheck)
+                {//if they're behavior rolls is under 70 then they attempt to defend a target, if they can't defend a squishy then they just attack
+                    if (blockForSquishy(botID))
+                    {
+                        actionTaken = true;
+                    }
+
+                }
+
+            }
+            //warior specific
+            if ( Teams[1][botID].Job == 1)
+            {
+                aiBehaviorCheck = 40;
+                if (aiBehavior < aiBehaviorCheck)
+                {//similar behavior to the tank but less chance to block
+                    if (blockForSquishy(botID))
+                    {
+                        actionTaken = true;
+                    }
+                }
+            }
+
+            //mage specific
+            if ( Teams[1][botID].Job == 3)
+            {
+                aiBehaviorCheck = 30;
+                //heal lowest health ally
+                if (aiBehavior < aiBehaviorCheck)
+                {
+                    aiHealthValues.Clear();
+                    for (int i = 0; i <  numberOfPlayers; i++)
+                    {
+                        if (Teams[1][i].HP > 0)
+                        {
+                            aiHealthValues.Add(new Health() { ID = i, HP = Teams[1][i].HP });
+                        }
+                    }
+                    aiHealthValues.Sort((a, b) => a.HP.CompareTo(b.HP));
+                    heal(aiHealthValues[0].ID, botID, 1);
+                    actionTaken = true;
+                }
+
+                //wait until the end
+                aiBehaviorCheck = 15;
+                if (aiBehavior < aiBehaviorCheck && actionTaken == false)
+                {
+                    //pass turn
+                    hold(botID, 1);
+                    holding = true;
+                    actionTaken = true;
+                }
+            }
+            if (actionTaken == false)
+            {//default action is to attack, the health values of eahc opponent are placed into a list then the lowest is found and this dictates the ai's target.
+                aiHealthValues.Clear();
+                for (int i = 0; i <  numberOfPlayers; i++)
+                {
+                    if (Teams[0][i].HP > 0)
+                    {
+                        aiHealthValues.Add(new Health(){ID = i, HP = Teams[0][i].HP});
+                    }
+                }
+                aiHealthValues.Sort((a, b) => a.HP.CompareTo(b.HP));
+                attack(botID,aiHealthValues[0].ID, 1, 0);
+            }
+            pressToContinue();
+            Console.Clear();
+            nextTurn(holding,false);
+            return;
+        }
+
+        /// <summary>
+        /// USED TO FIND A ROGUE OR MAGE WHICH THE AI BLOCK FOR
+        /// </summary>
+        bool blockForSquishy(int botID)
+        {
+            aiValues.Clear();
+            aiIDValues.Clear();
+            bool ok = false;
+            bool noBlock = false;
+            for (int i = 0; i <  Teams[1].Count; i++)
+            {
+                //assigns the job value of ai teammates to the list
+                aiValues.Add( Teams[1][i].Job);
+            }
+            //look for mages and rougues
+            for (int j = 0; j < aiValues.Count; j++)
+            {
+                if (aiValues[j] == 2 || aiValues[j] == 3)
+                {
+                    //assign index from aivalues to aiIDvalues, this can then be used to find the correct id for the defend target
+                    aiIDValues.Add(j);
+                }
+            }
+
+            if (aiIDValues.Count > 0)
+            {
+                int k = 0;
+
+                while (k < aiIDValues.Count && ok == false)
+                {
+                    if (Teams[1][aiIDValues[k]].defended == false && Teams[1][aiIDValues[k]].isDead == false)
+                    {
+                        defend(aiIDValues[k], botID, 1);
+                        ok = true;
+                        noBlock = false;
+                    }
+                    else
+                    {
+                        noBlock = true;
+                    }
+                    k++;
+                }
+            }
+            if (noBlock)
+            {
+                ok = false;
+            }
+            return ok;
+        }
+
+
+
+
+
+
+
+
+ 
+ 
+
+
+
+        /// <summary>
+        /// METHOD CALLED BETWEEN FIGHTS, LEVELS UP CHARACTERS IF YOU DEFEAT THE ENEMY
+        /// </summary>
+        public void battle(bool aiDead, bool playerDead)
+        {
+            //checks to see if the ai is dead
+            if (aiDead)
+            {
+                Console.Clear();
+                Console.WriteLine("{0} HAS EMERGED VICTORIOUS. BUT HOW WILL YOUR REMAINING MEMBERS FAIR AGAINST THEIR NEXT OPPONENT?",team1Name);
+                for (int i = 0; i < Teams[0].Count; i++)
+                {
+                    //gives xp to characters regardless of whether they died for the sake of enemy generation
+                    Teams[0][i].XP += rng(200, 500);
+                    if (Teams[0][i].isDead == false)
+                    {
+                        //randomly awards 2-5 levels
+                        
+                        Teams[0][i].Levelup();
+                    }
+                }
+                    //prints the stats for each player character
+                    for (int j = 0; j < Teams[0].Count;j++ )
+                    {
+                        if (Teams[0][j].isDead == false)
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("   --LEVELLING UP--");
+                            Teams[0][j].PrintStats();
+                            pressToContinue();
+                        }
+                    }
+                // prints the new opponennts stats
+            Console.Clear();
+            Console.WriteLine("INTRODUCING YOUR NEXT OPPONENTS...");
+                Team2.Clear();
+                createEnemy();
+            }
+            if (playerDead)
+            {// if the player dies then they're they are given the choice to restart
+                Console.WriteLine(" -YOU HAVE BEEN DEFEATED-");
+                Console.WriteLine();
+                Console.WriteLine(" PRINT COMBAT LOG? Y/N");
+                if (yesOrNo(Console.ReadLine()))
+                {
+                    for (int i = 0; i < combatLog.Count; i++)
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine(combatLog[i]);
+                    }
+                }
+                Console.WriteLine(" PLAY AGAIN? Y/N");
+                if (yesOrNo(Console.ReadLine()))
+                {
+                    Console.Clear();
+                    Run();
+                    return;
+                }
+                else
+                {
+                    Application.Exit();
+                }
+            }
+            createTurnOrder();
+            combatLog.Add("NEW ROUND");
+            nextTurn(false, true);
+
+        }
+
+        /// <summary>
+        /// CHECKS IF A TEAM IS DEAD THEN RETURNS TRUE OR FALSE
+        /// </summary>
+        bool isEveryoneDead(int teamToCheck)
+        {
+            int deaths = 0;
+            bool yes = false;
+            for (int i = 0; i < numberOfPlayers; i++)
+            {
+                if (Teams[teamToCheck][i].isDead)
+                {
+                    deaths++;
+                }
+            }
+            if (deaths == Teams[teamToCheck].Count)
+            {
+                yes = true;
+            }
+            return yes;
+        }
+
         /// <summary>
         /// ADVANCE TURNS, CHECKS TO SEE IF PLAYER OR AI IS NEXT. ALSO CHECKS TO SEE IF BATTLE IS OVER
         /// </summary>
-        public void nextTurn(bool hold,bool firstTurn)
+        public void nextTurn(bool hold, bool firstTurn)
         {
 
             if (isEveryoneDead(0))
@@ -858,173 +1210,8 @@ using System.Collections.Generic;
                 battle(false, false);
             }
             // if the turns haven't run out, but someone is dead, then do the according action
-            
+
         }
-
-
-
-
-        /// <summary>
-        /// AI CODE
-        /// if they're a mage then they'll have a 30% chance to heal  the lowest health ally. They also have a 15% to pass their turn.
-        /// if they're a tank then they'll have a 70% to defend for a rogue or mage.
-        /// if they're a warrior then they have a 40% to defend for a rogue or mage.
-        /// if they're a rogue then they'll attack regardless, they're pricks.
-        /// default behavior is just to attack the lowest health target
-        /// </summary>
-        void AIcombat(int botID)
-        {
-            aiValues.Clear();
-            aiIDValues.Clear();
-            //turn off defending
-            if ( Teams[1][botID].defending)
-            {
-                Console.WriteLine("{0} STOPPED DEFENDING",  Teams[1][botID].characterName);
-            }
-             Teams[1][botID].defendingOther = false;
-             Teams[1][botID].defending = false;
-             Teams[1][ Teams[1][botID].defendedID].defended = false;
-            bool holding = false;
-            //clear the value lists so they can be reassinged*
-            bool actionTaken = false;
-            //generate the behavior value
-            int aiBehavior = rng(1, 100);
-            //the value used to check which behavior the ai should perform
-            int aiBehaviorCheck;
-
-
-            //tank specific
-            if ( Teams[1][botID].Job == 0)
-            {
-                aiBehaviorCheck = 70;
-                if (aiBehavior < aiBehaviorCheck)
-                {
-                    if (blockForSquishy(botID))
-                    {
-                        actionTaken = true;
-                    }
-
-                }
-
-            }
-            //warior specific
-            if ( Teams[1][botID].Job == 1)
-            {
-                aiBehaviorCheck = 40;
-                if (aiBehavior < aiBehaviorCheck)
-                {
-                    if (blockForSquishy(botID))
-                    {
-                        actionTaken = true;
-                    }
-                }
-            }
-
-            //mage specific
-            if ( Teams[1][botID].Job == 3)
-            {
-                aiBehaviorCheck = 30;
-                //heal lowest health ally
-                if (aiBehavior < aiBehaviorCheck)
-                {
-                    aiHealthValues.Clear();
-                    for (int i = 0; i <  numberOfPlayers; i++)
-                    {
-                        if (Teams[1][i].HP > 0)
-                        {
-                            aiHealthValues.Add(new Health() { ID = i, HP = Teams[1][i].HP });
-                        }
-                    }
-                    aiHealthValues.Sort((a, b) => a.HP.CompareTo(b.HP));
-                    heal(aiHealthValues[0].ID, botID, 1);
-                    actionTaken = true;
-                }
-
-                //wait until the end
-                aiBehaviorCheck = 15;
-                if (aiBehavior < aiBehaviorCheck && actionTaken == false)
-                {
-                    //pass turn
-                    hold(botID, 1);
-                    holding = true;
-                    actionTaken = true;
-                }
-            }
-            if (actionTaken == false)
-            {
-                aiHealthValues.Clear();
-                for (int i = 0; i <  numberOfPlayers; i++)
-                {
-                    if (Teams[0][i].HP > 0)
-                    {
-                        aiHealthValues.Add(new Health(){ID = i, HP = Teams[0][i].HP});
-                    }
-                }
-                aiHealthValues.Sort((a, b) => a.HP.CompareTo(b.HP));
-                attack(botID,aiHealthValues[0].ID, 1, 0);
-            }
-            pressToContinue();
-            Console.Clear();
-            turnCount++;
-            nextTurn(holding,false);
-            return;
-        }
-
-        /// <summary>
-        /// USED TO FIND A ROGUE OR MAGE WHICH THE AI BLOCK FOR
-        /// </summary>
-        bool blockForSquishy(int botID)
-        {
-            aiValues.Clear();
-            aiIDValues.Clear();
-            bool ok = false;
-            bool noBlock = false;
-            for (int i = 0; i <  Teams[1].Count; i++)
-            {
-                //assigns the job value of ai teammates to the list
-                aiValues.Add( Teams[1][i].Job);
-            }
-            //look for mages and rougues
-            for (int j = 0; j < aiValues.Count; j++)
-            {
-                if (aiValues[j] == 2 || aiValues[j] == 3)
-                {
-                    //assign index from aivalues to aiIDvalues, this can then be used to find the correct id for the defend target
-                    aiIDValues.Add(j);
-                }
-            }
-
-            if (aiIDValues.Count > 0)
-            {
-                int k = 0;
-
-                while (k < aiIDValues.Count && ok == false)
-                {
-                    if (Teams[1][aiIDValues[k]].defended == false && Teams[1][aiIDValues[k]].isDead == false)
-                    {
-                        defend(aiIDValues[k], botID, 1);
-                        ok = true;
-                        noBlock = false;
-                    }
-                    else
-                    {
-                        noBlock = true;
-                    }
-                    k++;
-                }
-            }
-            if (noBlock)
-            {
-                ok = false;
-            }
-            return ok;
-        }
-
-
-
-
-
-
 
 
 
@@ -1032,57 +1219,9 @@ using System.Collections.Generic;
 
 
         /// <summary>
-        /// CHECKS IF A TEAM IS DEAD THEN RETURNS TRUE OR FALSE
+        /// A TEST GAME WHICH CREATES SOME GENERIC CHARACTERS, CHANGE RUN2 TO RUN TO TEST IT OUT
         /// </summary>
-        bool isEveryoneDead(int teamToCheck)
-        {
-            int deaths = 0;
-            bool yes = false;
-            for (int i = 0; i <  numberOfPlayers; i++)
-            {
-                if ( Teams[teamToCheck][i].isDead)
-                {
-                    deaths++;
-                }
-            }
-            if (deaths ==  Teams[teamToCheck].Count)
-            {
-                yes = true;
-            }
-            return yes;
-        }
-
-
-
-        ///<summary>
-        //MAIN LOGIC
-        ///</summary>
         public void Run2()
-        {
-
-
-            //intro text
-            Console.WriteLine("WELCOME CHALLENGERS TO CYBER AREA 20XX 2: TEAM BATTLE TOURNAMENT");
-            Console.WriteLine();
-            Console.WriteLine("IN THIS INTENSE COMBAT GAME YO WILL FACE OFF AGAINST THE FEARCEST");
-            Console.WriteLine("TEAMS OF FIGHTERS DROM ACCROSS THE GALAXY");
-            Console.WriteLine();
-            Console.WriteLine("REMEMBER THIS IS LIFE OR DEATH, IF A TEAM MEMBER GOES DOWN");
-            Console.WriteLine("THEN THEY'RE STAYING DOWN FOR GOOD");
-            Console.WriteLine();
-            choosePlayerNumber();
-            Console.WriteLine("BEGGINNING FIGHTER CREATION");
-            pressToContinue();
-            createPlayerCharacter();
-            createEnemy();
-
-            Console.ReadKey();
-        }
- 
-        /// <summary>
-        /// A TEST GAME WHICH CREATES SOME GENERIC CHARACTERS
-        /// </summary>
-        public void Run()
         {
             Console.WriteLine("TEST GAME");
             pressToContinue();
@@ -1096,7 +1235,7 @@ using System.Collections.Generic;
         }
 
         /// <summary>
-        /// CREATES GENERIC CHARACTERS FOR TEST GAME
+        /// THE CHARACTERS FOR TEST GAME
         /// </summary>
         void testMen()
         {
@@ -1116,51 +1255,8 @@ using System.Collections.Generic;
             Team1[0].PrintStats();
             Team1[1].PrintStats();
             Team1[2].PrintStats();
-           // Team1[3].PrintStats();
+            // Team1[3].PrintStats();
             //Team1[4].PrintStats();
         }
-
-
-        /// <summary>
-        /// METHOD CALLED BETWEEN FIGHTS, LEVELS UP CHARACTERS IF YOU DEFEAT THE ENEMY
-        /// </summary>
-        public void battle(bool aiDead, bool playerDead)
-        {
-            if (aiDead)
-            {
-                for (int i = 0; i < Teams[0].Count; i++)
-                {
-                    Console.Clear();
-                    Console.WriteLine("--LEVELLING UP--");
-                    Teams[0][i].XP += 100 * Teams[1][0].level;
-                    Teams[0][i].Levelup();
-                    for (int j = 0; j < Teams[0].Count;j++ )
-                    {
-                        Teams[0][j].PrintStats();
-                    }
-
-                }
-                Team2.Clear();
-                createEnemy();
-            }
-            if (playerDead)
-            {
-                //GOTTA FINSIH THIS
-                Console.WriteLine(" -YOU HAVE BEEN DEFEATED-");
-                Console.WriteLine();
-                Console.WriteLine(" PLAY AGAIN? Y/N");
-                if (yesOrNo(Console.ReadLine()))
-                {
-                    Run();
-                    return;
-                }
-            }
-            createTurnOrder();
-            nextTurn(false, true);
-
-        }
-
-
-
 
     }

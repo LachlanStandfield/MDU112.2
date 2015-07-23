@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CyberArea;
 
 
    public class Character
@@ -25,20 +24,20 @@ using CyberArea;
        public int XP = 0;
 
         //base health for each class, not growth. used for balance purposes.
-       int[] basehealth = new int[4] { 1000, 250, 200, 300 };
+       int[] basehealth = new int[4] { 800, 400, 200, 300 };
 
         //1)Paladin   2)Warrior  3)Rogue  4) Mage
         //add additional class by increasing array sizes, might put these into their own class later and make a list
         //stats used when leveling up, these are affected by character job, 
-        int[] strgrowth= new int[4]   {5,16,6,0};
-        int[] stamgrowth = new int[4] {23,9,4,10};
-        int[] dexgrowth = new int[4]  {4,9,18,6};
-        int[] intelgrowth = new int[4]{5,2,6,19};
+        int[] strgrowth= new int[4]   {3,20,8,0};
+        int[] stamgrowth = new int[4] {25,10,5,9};
+        int[] dexgrowth = new int[4]  {5,9,25,6};
+        int[] intelgrowth = new int[4]{2,1,9,26};
 
         //base values for critical strike, armour(damage reduction) and block, these are then altered slightly based on character level and on dexterity/intellect, stamina/strength and srength/dexterity stats repsectively
-        int[] critbase = new int[4] {1,5,40,7};
-        int[] blockbase = new int[4] { 6, 0, 1, 0 };
-        int[] armourbase = new int[4] { 18, 6, 2, 0 };
+        int[] critbase = new int[4]   { 0, 3, 50, 20};
+        int[] blockbase = new int[4]  { 4, 0, 1, 0 };
+        int[] armourbase = new int[4] { 20, 3, 2, 0 };
         
         //character stats
        public int str = 0;
@@ -55,7 +54,7 @@ using CyberArea;
        public int Job;
        public string characterName;
        public string teamName;
-       public string[] jobNames = new string[4] { "[CYBER TANK]", "[MECHA WARRIOR]", "[WARP ROGUE]", "[TECHNO MAGE]" };
+       public string[] jobNames = new string[4] { "[BORG TANK]", "[MECHA GALDIATOR]", "[WARP SLICER]", "[CYBER CASTER]" };
 
        //combat variables to determine whether this character is dead
        public bool isDead = false;
@@ -221,7 +220,7 @@ using CyberArea;
            }
            else
            {
-               damage = str * 7;
+               damage = str * 9;
            }
            if (defended)
            {
@@ -344,14 +343,13 @@ using CyberArea;
 
                 // alter block and crit chance
                 critchance = critbase[Job] + (dex / (2 * level) + (intel / (3* level)));
-                blockchance = blockbase[Job] + (str / (4 * level))+ (dex / (4 * level));
-                armour = armourbase[Job] + (stam / (3 * level)) + (str / (3 * level));
+                blockchance = blockbase[Job] + (str / (5 * level))+ (dex / (5 * level)+ (stam / (5 * level)));
+                armour = armourbase[Job] + (stam / (3 * level)) + (str / (5 * level));
                 newLevels--;
             }
             // restore and alter health based on satmina
             maxHealth = basehealth[Job] + (stam * 10);
             HP = maxHealth;
-            isDead = false;
         }
 
 
