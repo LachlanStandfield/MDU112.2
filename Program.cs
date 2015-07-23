@@ -1109,7 +1109,7 @@ using System.Collections.Generic;
                 }
                 else
                 {
-                    Application.Exit();
+                    return;
                 }
             }
             createTurnOrder();
