@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
         //lists for Turn order
         List<int> turn1 = new List<int>();
-        List<int> turn2 = new List<int>();
+        List<int> availableTurns = new List<int>();
 
 
         string team1Name;
@@ -22,9 +22,6 @@ using System.Collections.Generic;
 
         int turnCount = 1;
 
-
-        List<int> availableTurns = new List<int>();
-
         //COMBAT INFO VARIABLES
         int comabtlogTurnNumber;
         List<string> combatLog = new List<string>();
@@ -33,11 +30,7 @@ using System.Collections.Generic;
         List<int> aiValues = new List<int>();
         List<int> aiIDValues = new List<int>();
 
-        int turnOrderCount;
-        int specialEyes = 0;
 
-        //ten possible turns, 33 is assigned to non used spaces
-        int[] turns = new int[10] { 33, 33, 33, 33, 33, 33, 33, 33, 33, 33 };
 
         ///<summary>
         ///RANDOM NUMBER GENERATOR
@@ -60,7 +53,7 @@ using System.Collections.Generic;
         }
 
         /// <summary>
-        /// Check for a number based answer
+        /// CHECK FOR NUMBER BASED ANSWER
         /// </summary>
         int checkNumberAnswer()
         {
@@ -264,7 +257,6 @@ using System.Collections.Generic;
             Console.WriteLine("        TURN ORDER");
             Console.WriteLine("---------------------------");
             Console.WriteLine();
-            turnOrderFill(false);
 
 
             for (int i = 0; i < availableTurns.Count; i++)
@@ -276,7 +268,7 @@ using System.Collections.Generic;
                 }
                 else
                 {
-                    Console.WriteLine((i + 1) + " " +  Team2[availableTurns[i] -  numberOfPlayers].statBrief());
+                    Console.WriteLine((i + 1) + " " +  Team2[availableTurns[i]-numberOfPlayers].statBrief());
                     Console.WriteLine();
                 }
             }
@@ -287,145 +279,150 @@ using System.Collections.Generic;
 
         }
 
-
+        /// <summary>
+        /// CREATES TURN ORDER BASED ON A RANDOM NUMBER AND THE CHARACTER'S DEXTERITY
+        /// </summary>
         void createTurnOrder()
         {
+            availableTurns.Clear();
             //assign the 
             for (int j = 0; j < Teams.Length; j++)
             {
-                for (int i = 0; i < Teams[0].Count; i++)
+                for (int i = 0; i < Teams[j].Count; i++)
                 {
                     //create a random based on the character's dex and a random number between 1 and 1000
                     turn1.Add(rng(1, 1000) + rng(0,Teams[j][i].dex));
-                    if (j < numberOfPlayers)
+                    //assign the index number in the available turns list
+                    if (j == 0)
                     {
-                        turn2.Add(i);
+                        availableTurns.Add(i);
+                        Console.WriteLine(turn1[i]);
                     }
                     else
                     {
-                        turn2.Add(i + numberOfPlayers);
+                        availableTurns.Add(i + numberOfPlayers);
+                        Console.WriteLine(turn1[i]);
                     }
-                    
+
+                    Console.WriteLine("{0} {1}", Teams[j][i].characterName, turn1[i]);
                 }
             
             }
-            //sort the list to put the highest value first
-            for (int k = 0; k < turn1.Count; k++)
+
+            var sortedList = availableTurns.OrderBy(item => int.Parse(item));
+
+            //sort the list to put the highest value first, followed by the lower values                                        
+            for (int k = 0; k < availableTurns.Count; k++)
             {
-
-            }
-
-
-            
-        }
-
-        /// <summary>
-        /// DETERMINES TURN ORDER, CURRENTLY RNG BASED, WILL TRY TO MAKE DEX BASED
-        /// </summary>
-        public void turnOrder()
-        {
-            specialEyes = 0;
-            while (specialEyes < ( numberOfPlayers * 2))
-            {
-
-                bool valid = false;
-
-                while (valid == false)
+                Console.WriteLine(k);
+                //if k isn't the first number in the array then 
+                if (k > 0)
                 {
-
-                    turnOrderCount = specialEyes;
-                    turns[specialEyes] = rng(0,  numberOfPlayers * 2);
-                    valid = checkAgainstOthers(turns[specialEyes]);
-
-                }
-                specialEyes++;
-            }
-
-
-        }
-
-
-        /// <summary>
-        /// FILLS THE TURN ORDER LSIT, THE PHASE START BOOLEAN IS USED TO DETERMINE IF ALL CHARACTERS SHOULD BE ADDED TO THE LIST
-        /// </summary>
-        public void turnOrderFill(bool phasestart)
-        {
-            if (phasestart)
-            {
-                availableTurns.Clear();
-                for (int i = 0; i < numberOfPlayers * 2; i++)
-                {
-                    if (turns[i] != 33)
+                    // if k isn't at the end of the list then compare the one after it
+                    if (k < turn1.Count-1)
                     {
-                        if (turns[i] < numberOfPlayers)
+                        
+                        if (turn1[k + 1] > turn1[k])
                         {
-                            if (Team1[turns[i]].isDead == false)
+                            int temp = turn1[k];
+                            turn1[k] = turn1[k + 1];
+                            turn1[k + 1] = temp;
+
+                            temp = availableTurns[k];
+                            availableTurns[k] = availableTurns[k + 1];
+                            availableTurns[k + 1] = temp;
+                        }
+                        // if k is after the first number in the array then compare it to the previous
+                        if (k >= 1)
+                        {
+                            if (turn1[k - 1] > turn1[k])
                             {
-                                availableTurns.Add(turns[i]);
+                                int temp = turn1[k-1];
+                                turn1[k-1] = turn1[k];
+                                turn1[k] = temp;
+
+                                temp = availableTurns[k-1];
+                                availableTurns[k-1] = availableTurns[k];
+                                availableTurns[k] = temp;
                             }
                         }
-                        else
-                        {
-                            if (Teams[1][turns[i] - numberOfPlayers].isDead == false)
-                            {
-                                availableTurns.Add(turns[i]);
-                            }
-                        }
+
                     }
+                 // if k = 0 then compare it the the number after
                 }
-            }
-            else
-            {
-                for (int i = 0; i < availableTurns.Count; i++)
+                else if (k == 0)
                 {
-                    if (availableTurns[i] < numberOfPlayers)
+                    if (turn1[k + 1] > turn1[k])
                     {
-                        if (Teams[0][availableTurns[i]].isDead)
-                        {
-                            availableTurns.Remove(availableTurns[i]);
-                        }
-                    }
-                    else
-                    {
-                        if (Teams[1][availableTurns[i] - numberOfPlayers].isDead)
-                        {
-                            availableTurns.Remove(availableTurns[i]);
-                        }
+                        int temp = turn1[k];
+                        turn1[k] = turn1[k + 1];
+                        turn1[k + 1] = temp;
+
+                        temp = availableTurns[k];
+                        availableTurns[k] = availableTurns[k + 1];
+                        availableTurns[k + 1] = temp;
+
                     }
                 }
-            }
-
-        }
-
-        /// <summary>
-        /// CHECKS TURNS AGAINST ONE ANOTHER TO MAKE SURE THERE ARE NO DUPLICATES
-        /// </summary>
-        bool checkAgainstOthers(int toCheck)
-        {
-            bool valid = true;
-            bool firstTurn = false;
-            int i = 0;
-
-            if (turnOrderCount == 0)
-            {
-                firstTurn = true;
-                valid = true;
-            }
-            if (firstTurn == false)
-            {
-                while (i < turnOrderCount)
+                    //if k is the last value in the list then compare it to the one before it
+                else if (k == turn1.Count - 1)
                 {
-                    if (turns[i] == toCheck)
+                    if (turn1[k - 1] > turn1[k])
                     {
-                        valid = false;
+                        int temp = turn1[k - 1];
+                        turn1[k - 1] = turn1[k];
+                        turn1[k] = temp;
+
+                        temp = availableTurns[k - 1];
+                        availableTurns[k - 1] = availableTurns[k];
+                        availableTurns[k] = temp;
                     }
-                    i++;
+                }
+
+            }
+
+            for (int h = 0; h < availableTurns.Count; h++)
+            {
+                Console.WriteLine(turn1[h]);
+            }
+            Console.WriteLine();
+            for (int h = 0; h < availableTurns.Count; h++)
+            {
+                //check to see if anyone's dead, if they are then they are removed from the list
+                if (availableTurns[h] < numberOfPlayers)
+                {
+                    if (Team1[availableTurns[h]].isDead)
+                    {
+                        availableTurns.Remove(h);
+                    }
+                }
+                else
+                {
+                    if (Team2[availableTurns[h]-numberOfPlayers].isDead)
+                    {
+                        availableTurns.Remove(h);
+                    }
+                }
+                
+            }
+
+
+            Console.WriteLine();
+            //print them out to test
+            for (int p = 0; p < availableTurns.Count; p++)
+            {
+                if (p < numberOfPlayers)
+                {
+                    Console.WriteLine("{0}", Teams[0][p].characterName);
+                }
+                else
+                {
+                    Console.WriteLine("{0}", Teams[1][p-numberOfPlayers].characterName);
                 }
             }
-            return valid;
+
+            turnOrderPrint();
         }
-
-
 
 
 
@@ -826,10 +823,6 @@ using System.Collections.Generic;
             {
                 availableTurns[i] = tempTurns[i + 1];
             }
-            for (int i = 0; i < availableTurns.Count; i++)
-            {
-                turns[i] = availableTurns[i];
-            }
         }
 
         /// <summary>
@@ -913,7 +906,7 @@ using System.Collections.Generic;
                 if (availableTurns.Count > 0)
                 {
                     //print the turn order
-                    turnOrderPrint();
+                    createTurnOrder();
                     //check to see whether it is the ai or the player going next
                     if (availableTurns[0] < numberOfPlayers)
                     {
@@ -932,23 +925,23 @@ using System.Collections.Generic;
                 //check to see if one team or the other is dead and if they are then do the according action
                 if (isEveryoneDead(0))
                 {
-                    battle(false, true, false);
+                    battle(false, true);
                 }
                 if (isEveryoneDead(1))
                 {
-                    battle(true, false, false);
+                    battle(true, false);
                 }
                 //ortherwise contunue the battle
-                battle(false, false, true);
+                battle(false, false);
             }
             // if the turns haven't run out, but someone is dead, then do the according action
             else if (isEveryoneDead(0))
             {
-                battle(false, true, false);
+                battle(false, true);
             }
             else if (isEveryoneDead(1))
             {
-                battle(true, false, false);
+                battle(true, false);
             }
         }
 
@@ -1263,7 +1256,7 @@ using System.Collections.Generic;
             testMen();
             createEnemy();
             Console.Clear();
-            battle(false, false, false);
+            battle(false, false);
             return;
 
 
@@ -1298,7 +1291,7 @@ using System.Collections.Generic;
         /// <summary>
         /// METHOD CALLED BETWEEN FIGHTS, LEVELS UP CHARACTERS IF YOU DEFEAT THE ENEMY
         /// </summary>
-        public void battle(bool aiDead, bool playerDead, bool continuation)
+        public void battle(bool aiDead, bool playerDead)
         {
             if (aiDead)
             {
@@ -1316,17 +1309,7 @@ using System.Collections.Generic;
                 //GOTTA FINSIH THIS
                 Console.WriteLine(" GAME OVER LOL");
             }
-
-            turnOrder();
-            if (continuation)
-            {
-                turnOrderFill(false);
-            }
-            else
-            {
-                turnOrderFill(true);
-            }
-
+            createTurnOrder();
             nextTurn(false);
 
         }

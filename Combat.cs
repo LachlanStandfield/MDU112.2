@@ -671,21 +671,21 @@ namespace CyberArea
             {
                 if (isEveryoneDead(0))
                 {
-                    program.battle(false, true, false);
+                    program.battle(false, true);
                 }
                 if (isEveryoneDead(1))
                 {
-                    program.battle(true, false, false);
+                    program.battle(true, false);
                 }
-                program.battle(false, false, true);
+                program.battle(false, false);
             }
             else if (isEveryoneDead(0))
             {
-                program.battle(false, true, false);
+                program.battle(false, true);
             }
             else if (isEveryoneDead(1))
             {
-                program.battle(true, false, false);
+                program.battle(true, false);
             }
         }
 
