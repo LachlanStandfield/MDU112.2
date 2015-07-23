@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
         //lists for Turn order
         List<int> turn1 = new List<int>();
-        List<int> availableTurns = new List<int>();
+         List<Turns> availableTurns = new List<Turns>();
 
 
         string team1Name;
@@ -29,6 +29,7 @@ using System.Collections.Generic;
         //LISTS USED IN AI BEHAVIOR
         List<int> aiValues = new List<int>();
         List<int> aiIDValues = new List<int>();
+        List<Health> aiHealthValues = new List<Health>();
 
 
 
@@ -235,7 +236,7 @@ using System.Collections.Generic;
                 Teams[1][count].teamName = team2Name;
                 Teams[1][count].characterID = assignID;
                 assignID++;
-                Teams[1][count].XP = rng(1, 100) + (Team1[count].level * 100);
+                Teams[1][count].XP = rng(1,200)+Team1[count].level * 100 -100;
                 Teams[1][count].Levelup();
 
                 //announce them
@@ -257,24 +258,25 @@ using System.Collections.Generic;
             Console.WriteLine("        TURN ORDER");
             Console.WriteLine("---------------------------");
             Console.WriteLine();
+            updateTurnOrder();
 
 
             for (int i = 0; i < availableTurns.Count; i++)
             {
-                if (availableTurns[i] <  numberOfPlayers)
+                if (availableTurns[i].ID <  numberOfPlayers)
                 {
-                    Console.WriteLine((i + 1) + " " +  Team1[availableTurns[i]].statBrief());
+                    Console.WriteLine((i + 1) + " " +  Team1[availableTurns[i].ID].statBrief());
                     Console.WriteLine();
                 }
                 else
                 {
-                    Console.WriteLine((i + 1) + " " +  Team2[availableTurns[i]-numberOfPlayers].statBrief());
+                    Console.WriteLine((i + 1) + " " +  Team2[availableTurns[i].ID-numberOfPlayers].statBrief());
                     Console.WriteLine();
                 }
             }
 
 
-             pressToContinue();
+            pressToContinue();
             Console.Clear();
 
         }
@@ -285,144 +287,48 @@ using System.Collections.Generic;
         void createTurnOrder()
         {
             availableTurns.Clear();
-            //assign the 
             for (int j = 0; j < Teams.Length; j++)
             {
                 for (int i = 0; i < Teams[j].Count; i++)
                 {
-                    //create a random based on the character's dex and a random number between 1 and 1000
-                    turn1.Add(rng(1, 1000) + rng(0,Teams[j][i].dex));
-                    //assign the index number in the available turns list
                     if (j == 0)
                     {
-                        availableTurns.Add(i);
-                        Console.WriteLine(turn1[i]);
+                        availableTurns.Add(new Turns() {ID = i, priority = (rng(1,1000)+rng(0,Teams[j][i].dex))});
                     }
                     else
                     {
-                        availableTurns.Add(i + numberOfPlayers);
-                        Console.WriteLine(turn1[i]);
+                        availableTurns.Add(new Turns() { ID = i+numberOfPlayers, priority = (rng(1, 1000) + rng(0, Teams[j][i].dex)) });
                     }
-
-                    Console.WriteLine("{0} {1}", Teams[j][i].characterName, turn1[i]);
                 }
-            
             }
 
-            var sortedList = availableTurns.OrderBy(item => int.Parse(item));
+            availableTurns.Sort((a, b) => a.priority.CompareTo(b.priority));  
+        }
 
-            //sort the list to put the highest value first, followed by the lower values                                        
-            for (int k = 0; k < availableTurns.Count; k++)
+        /// <summary>
+        /// updates turn order by removing dead guys
+        /// </summary>
+        void updateTurnOrder()
+        {
+            for (int i = 0; i < availableTurns.Count; i++)
             {
-                Console.WriteLine(k);
-                //if k isn't the first number in the array then 
-                if (k > 0)
+                if (availableTurns[i].ID < numberOfPlayers)
                 {
-                    // if k isn't at the end of the list then compare the one after it
-                    if (k < turn1.Count-1)
+                    if (Teams[0][availableTurns[i].ID].HP == 0)
                     {
-                        
-                        if (turn1[k + 1] > turn1[k])
-                        {
-                            int temp = turn1[k];
-                            turn1[k] = turn1[k + 1];
-                            turn1[k + 1] = temp;
-
-                            temp = availableTurns[k];
-                            availableTurns[k] = availableTurns[k + 1];
-                            availableTurns[k + 1] = temp;
-                        }
-                        // if k is after the first number in the array then compare it to the previous
-                        if (k >= 1)
-                        {
-                            if (turn1[k - 1] > turn1[k])
-                            {
-                                int temp = turn1[k-1];
-                                turn1[k-1] = turn1[k];
-                                turn1[k] = temp;
-
-                                temp = availableTurns[k-1];
-                                availableTurns[k-1] = availableTurns[k];
-                                availableTurns[k] = temp;
-                            }
-                        }
-
-                    }
-                 // if k = 0 then compare it the the number after
-                }
-                else if (k == 0)
-                {
-                    if (turn1[k + 1] > turn1[k])
-                    {
-                        int temp = turn1[k];
-                        turn1[k] = turn1[k + 1];
-                        turn1[k + 1] = temp;
-
-                        temp = availableTurns[k];
-                        availableTurns[k] = availableTurns[k + 1];
-                        availableTurns[k + 1] = temp;
-
-                    }
-                }
-                    //if k is the last value in the list then compare it to the one before it
-                else if (k == turn1.Count - 1)
-                {
-                    if (turn1[k - 1] > turn1[k])
-                    {
-                        int temp = turn1[k - 1];
-                        turn1[k - 1] = turn1[k];
-                        turn1[k] = temp;
-
-                        temp = availableTurns[k - 1];
-                        availableTurns[k - 1] = availableTurns[k];
-                        availableTurns[k] = temp;
-                    }
-                }
-
-            }
-
-            for (int h = 0; h < availableTurns.Count; h++)
-            {
-                Console.WriteLine(turn1[h]);
-            }
-            Console.WriteLine();
-            for (int h = 0; h < availableTurns.Count; h++)
-            {
-                //check to see if anyone's dead, if they are then they are removed from the list
-                if (availableTurns[h] < numberOfPlayers)
-                {
-                    if (Team1[availableTurns[h]].isDead)
-                    {
-                        availableTurns.Remove(h);
+                        availableTurns.RemoveAt(i);
                     }
                 }
                 else
                 {
-                    if (Team2[availableTurns[h]-numberOfPlayers].isDead)
+                    if (Teams[1][availableTurns[i].ID - numberOfPlayers].HP == 0)
                     {
-                        availableTurns.Remove(h);
+                        availableTurns.RemoveAt(i);
                     }
+                }
                 }
                 
             }
-
-
-            Console.WriteLine();
-            //print them out to test
-            for (int p = 0; p < availableTurns.Count; p++)
-            {
-                if (p < numberOfPlayers)
-                {
-                    Console.WriteLine("{0}", Teams[0][p].characterName);
-                }
-                else
-                {
-                    Console.WriteLine("{0}", Teams[1][p-numberOfPlayers].characterName);
-                }
-            }
-
-            turnOrderPrint();
-        }
 
 
 
@@ -548,7 +454,7 @@ using System.Collections.Generic;
                 {
                      pressToContinue();
                     Console.Clear();
-                    nextTurn(true);
+                    nextTurn(true,false);
                     return;
                 }
                 else
@@ -556,7 +462,7 @@ using System.Collections.Generic;
                     pressToContinue();
                     Console.Clear();
                     turnCount++;
-                    nextTurn(false);
+                    nextTurn(false,false);
                     return;
                 }
             }
@@ -816,12 +722,12 @@ using System.Collections.Generic;
 
             for (int i = 0; i < availableTurns.Count; i++)
             {
-                tempTurns.Add(availableTurns[i]);
+                tempTurns.Add(availableTurns[i].ID);
             }
-            availableTurns[availableTurns.Count - 1] = tempTurns[0];
+            availableTurns[availableTurns.Count - 1].ID = tempTurns[0];
             for (int i = 0; i < availableTurns.Count - 1; i++)
             {
-                availableTurns[i] = tempTurns[i + 1];
+                availableTurns[i].ID = tempTurns[i + 1];
             }
         }
 
@@ -884,13 +790,26 @@ using System.Collections.Generic;
         /// <summary>
         /// ADVANCE TURNS, CHECKS TO SEE IF PLAYER OR AI IS NEXT. ALSO CHECKS TO SEE IF BATTLE IS OVER
         /// </summary>
-        public void nextTurn(bool hold)
+        public void nextTurn(bool hold,bool firstTurn)
         {
+
+            if (isEveryoneDead(0))
+            {
+                availableTurns.Clear();
+                battle(false, true);
+                return;
+            }
+            if (isEveryoneDead(1))
+            {
+                availableTurns.Clear();
+                battle(true, false);
+                return;
+            }
             //if there are turns that need to be played out
             if (availableTurns.Count > 0)
             {
                 //if it's not the very first turn
-                if (turnCount > 1)
+                if (firstTurn == false)
                 {
                     //if the previous turn didn't result in a hold then remove the previous turn from the stack
                     if (hold)
@@ -905,16 +824,15 @@ using System.Collections.Generic;
                 // if there are still more turns after the previous one is removed then
                 if (availableTurns.Count > 0)
                 {
-                    //print the turn order
-                    createTurnOrder();
+                    turnOrderPrint();
                     //check to see whether it is the ai or the player going next
-                    if (availableTurns[0] < numberOfPlayers)
+                    if (availableTurns[0].ID < numberOfPlayers)
                     {
-                        playerOptions(availableTurns[0]);
+                        playerOptions(availableTurns[0].ID);
                     }
                     else
                     {
-                        AIcombat(availableTurns[0] - numberOfPlayers);
+                        AIcombat(availableTurns[0].ID - numberOfPlayers);
                     }
                 }
 
@@ -925,24 +843,22 @@ using System.Collections.Generic;
                 //check to see if one team or the other is dead and if they are then do the according action
                 if (isEveryoneDead(0))
                 {
+                    availableTurns.Clear();
                     battle(false, true);
+                    return;
                 }
                 if (isEveryoneDead(1))
                 {
+                    availableTurns.Clear();
                     battle(true, false);
+                    return;
                 }
                 //ortherwise contunue the battle
+                availableTurns.Clear();
                 battle(false, false);
             }
             // if the turns haven't run out, but someone is dead, then do the according action
-            else if (isEveryoneDead(0))
-            {
-                battle(false, true);
-            }
-            else if (isEveryoneDead(1))
-            {
-                battle(true, false);
-            }
+            
         }
 
 
@@ -1011,12 +927,16 @@ using System.Collections.Generic;
                 //heal lowest health ally
                 if (aiBehavior < aiBehaviorCheck)
                 {
+                    aiHealthValues.Clear();
                     for (int i = 0; i <  numberOfPlayers; i++)
                     {
-                        aiValues.Add( Teams[1][i].HP);
+                        if (Teams[1][i].HP > 0)
+                        {
+                            aiHealthValues.Add(new Health() { ID = i, HP = Teams[1][i].HP });
+                        }
                     }
-                    checkLowestValue();
-                    heal(aiIDValues[rng(0,aiIDValues.Count-1)], botID, 1);
+                    aiHealthValues.Sort((a, b) => a.HP.CompareTo(b.HP));
+                    heal(aiHealthValues[0].ID, botID, 1);
                     actionTaken = true;
                 }
 
@@ -1032,18 +952,21 @@ using System.Collections.Generic;
             }
             if (actionTaken == false)
             {
-                aiValues.Clear();
+                aiHealthValues.Clear();
                 for (int i = 0; i <  numberOfPlayers; i++)
                 {
-                    aiValues.Add(Teams[0][i].HP);
+                    if (Teams[0][i].HP > 0)
+                    {
+                        aiHealthValues.Add(new Health(){ID = i, HP = Teams[0][i].HP});
+                    }
                 }
-                checkLowestValue();
-                attack(botID, aiIDValues[rng(0, aiIDValues.Count - 1)], 1, 0);
+                aiHealthValues.Sort((a, b) => a.HP.CompareTo(b.HP));
+                attack(botID,aiHealthValues[0].ID, 1, 0);
             }
             pressToContinue();
             Console.Clear();
             turnCount++;
-            nextTurn(holding);
+            nextTurn(holding,false);
             return;
         }
 
@@ -1077,14 +1000,11 @@ using System.Collections.Generic;
 
                 while (k < aiIDValues.Count && ok == false)
                 {
-                    if ( Teams[1][botID].defended == false)
+                    if (Teams[1][aiIDValues[k]].defended == false && Teams[1][aiIDValues[k]].isDead == false)
                     {
-                        if ( Teams[1][aiIDValues[k]].defended == false &&  Teams[1][aiIDValues[k]].isDead == false)
-                        {
-                            defend(aiIDValues[k], botID, 1);
-                            ok = true;
-                            noBlock = false;
-                        }
+                        defend(aiIDValues[k], botID, 1);
+                        ok = true;
+                        noBlock = false;
                     }
                     else
                     {
@@ -1098,93 +1018,6 @@ using System.Collections.Generic;
                 ok = false;
             }
             return ok;
-        }
-
-        /// <summary>
-        /// USED TO FIND LOW HEALTH TARGETS FOR THE AI
-        /// </summary>
-        void checkLowestValue()
-        {
-            aiIDValues.Clear();
-            //aiValues is assigned during the aiCombat method, this can represent the health of allies or enemies
-            //assigns the values from aiValues 1 to aiValues2, this is then used to find the lowest value
-            for (int i = 0; i < aiValues.Count; i++)
-            {
-                aiIDValues.Add(i);
-            }
-
-            if (aiValues.Count > 1)
-            {
-
-
-                for (int i = 0; i < aiValues.Count; i++)
-                {
-                    int temp;
-                    //check to see if the current i is not the last item in the list
-                    if (i + 1 < aiValues.Count)
-                    {
-                        // if the current value is greater than the next value, then those values are switched using a temporary variable
-                        if (aiValues[i] > aiValues[i + 1])
-                        {
-                            temp = aiValues[i];
-                            aiValues[i] = aiValues[i + 1];
-                            aiValues[i + 1] = temp;
-
-                            //change the id value to match the health value
-                            temp = aiIDValues[i];
-                            aiIDValues[i] = aiIDValues[i + 1];
-                            aiIDValues[i + 1] = temp;
-
-                            //if i is the second or higher item in the list
-                            if (i - 1 >= 0)
-                            {
-
-                                //checks to see if if the current value is smaller than the previous
-                                if (aiValues[i] < aiValues[i - 1])
-                                {
-                                    temp = aiValues[i - 1];
-                                    //switch current value to the lower slot
-                                    aiValues[i - 1] = aiValues[i];
-                                    aiValues[i] = temp;
-                                    //do the same with the id values
-                                    temp = aiIDValues[i - 1];
-                                    aiIDValues[i - 1] = aiIDValues[i];
-                                    aiIDValues[i] = temp;
-
-                                }
-                            }
-                        }
-
-                    }
-                    //if i is the last item in the list, then check it against the first and move the rest back accordingly
-                    else
-                    {
-                        if (aiValues[i] < aiValues[0] && i >= 1)
-                        {
-                            temp = aiValues[0];
-                            aiValues[0] = aiValues[i];
-                            aiValues[i] = aiValues[i - 1];
-                            aiValues[1] = temp;
-
-                            int temp2 = aiIDValues[0];
-                            aiIDValues[0] = aiIDValues[i];
-                            aiIDValues[i] = aiIDValues[i - 1];
-                            aiIDValues[1] = temp2;
-                        }
-                    }
-                }
-            }
-
-            //remove 0 values as it means the target is dead
-            for (int i = 0; i < aiValues.Count; i++)
-            {
-                if (aiValues[0] == 0)
-                {
-                    aiValues.Remove(aiValues[0]);
-                    aiIDValues.Remove(aiIDValues[0]);
-                }
-            }
-
         }
 
 
@@ -1268,22 +1101,22 @@ using System.Collections.Generic;
         void testMen()
         {
             int testXP = 500;
-            numberOfPlayers = 4;
+            numberOfPlayers = 3;
             team1Name = "[TEAM TESTER]";
             Team1.Add(new Character() { characterID = 1, characterName = "[TEST TANK]", Job = 0, XP = testXP, teamName = team1Name, TeamID = 0 });
             Team1.Add(new Character() { characterID = 2, characterName = "[TEST WARRIOR]", Job = 1, XP = testXP, teamName = team1Name, TeamID = 0 });
             Team1.Add(new Character() { characterID = 3, characterName = "[TEST MAGE THE 3RD]", Job = 3, XP = testXP, teamName = team1Name, TeamID = 0 });
-            Team1.Add(new Character() { characterID = 4, characterName = "[TEST MAGE]", Job = 3, XP = testXP, teamName = team1Name, TeamID = 0 });
+            //Team1.Add(new Character() { characterID = 4, characterName = "[TEST MAGE]", Job = 3, XP = testXP, teamName = team1Name, TeamID = 0 });
             //Team1.Add(new Character() { characterID = 5, characterName = "[TEST MAGE THE 2ND]", Job = 3, XP = testXP, teamName = team1Name, TeamID = 0});
             Team1[0].Levelup();
             Team1[1].Levelup();
             Team1[2].Levelup();
-            Team1[3].Levelup();
+            //Team1[3].Levelup();
             //Team1[4].Levelup();
             Team1[0].PrintStats();
             Team1[1].PrintStats();
             Team1[2].PrintStats();
-            Team1[3].PrintStats();
+           // Team1[3].PrintStats();
             //Team1[4].PrintStats();
         }
 
@@ -1297,8 +1130,14 @@ using System.Collections.Generic;
             {
                 for (int i = 0; i < Teams[0].Count; i++)
                 {
+                    Console.Clear();
+                    Console.WriteLine("--LEVELLING UP--");
                     Teams[0][i].XP += 100 * Teams[1][0].level;
                     Teams[0][i].Levelup();
+                    for (int j = 0; j < Teams[0].Count;j++ )
+                    {
+                        Teams[0][j].PrintStats();
+                    }
 
                 }
                 Team2.Clear();
@@ -1307,10 +1146,17 @@ using System.Collections.Generic;
             if (playerDead)
             {
                 //GOTTA FINSIH THIS
-                Console.WriteLine(" GAME OVER LOL");
+                Console.WriteLine(" -YOU HAVE BEEN DEFEATED-");
+                Console.WriteLine();
+                Console.WriteLine(" PLAY AGAIN? Y/N");
+                if (yesOrNo(Console.ReadLine()))
+                {
+                    Run();
+                    return;
+                }
             }
             createTurnOrder();
-            nextTurn(false);
+            nextTurn(false, true);
 
         }
 

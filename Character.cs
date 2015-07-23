@@ -31,13 +31,13 @@ using CyberArea;
         //add additional class by increasing array sizes, might put these into their own class later and make a list
         //stats used when leveling up, these are affected by character job, 
         int[] strgrowth= new int[4]   {5,16,6,0};
-        int[] stamgrowth = new int[4] {23,8,4,5};
+        int[] stamgrowth = new int[4] {23,9,4,10};
         int[] dexgrowth = new int[4]  {4,9,18,6};
         int[] intelgrowth = new int[4]{5,2,6,19};
 
         //base values for critical strike, armour(damage reduction) and block, these are then altered slightly based on character level and on dexterity/intellect, stamina/strength and srength/dexterity stats repsectively
         int[] critbase = new int[4] {1,5,40,7};
-        int[] blockbase = new int[4] { 10, 0, 1, 0 };
+        int[] blockbase = new int[4] { 6, 0, 1, 0 };
         int[] armourbase = new int[4] { 18, 6, 2, 0 };
         
         //character stats
@@ -46,7 +46,7 @@ using CyberArea;
        public int dex = 0;
        public int intel = 0;
 
-        // combat stats, critchance gives a chance to do 5x damage, blackchance gives the chance to block all damage, armour reduces damage taken by a percent
+        // combat stats, critchance gives a chance to do 3x damage, blackchance gives the chance to block all damage, armour reduces damage taken by a percent
        public int critchance;
        public  int blockchance;
        public  int armour;
@@ -60,7 +60,7 @@ using CyberArea;
        //combat variables to determine whether this character is dead
        public bool isDead = false;
 
-        //combat variables, used for whether their in a  defensive postion or wheather another player is defending them
+       //combat variables, used for whether their in a  defensive postion or wheather another player is defending them
        //defensive stance lasts until this character's next turn
        int defenceArmour;
        int defenceBlock;
@@ -248,6 +248,7 @@ using CyberArea;
                defended = false;
                Program.Teams[TeamID][defender].defending = false;
                Program.Teams[TeamID][defender].defendingOther = false;
+               Program.Teams[TeamID][defendedID].defended = false;
                
                
 
@@ -343,13 +344,14 @@ using CyberArea;
 
                 // alter block and crit chance
                 critchance = critbase[Job] + (dex / (2 * level) + (intel / (3* level)));
-                blockchance = blockbase[Job] + (str / (3 * level))+ (dex / (3 * level));
+                blockchance = blockbase[Job] + (str / (4 * level))+ (dex / (4 * level));
                 armour = armourbase[Job] + (stam / (3 * level)) + (str / (3 * level));
                 newLevels--;
             }
             // restore and alter health based on satmina
             maxHealth = basehealth[Job] + (stam * 10);
             HP = maxHealth;
+            isDead = false;
         }
 
 

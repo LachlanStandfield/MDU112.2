@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-    class Turns
+    class Health
     {
-       public int priority;
+        public int HP;
         public int ID;
     }
 
