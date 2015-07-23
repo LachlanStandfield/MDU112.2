@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CyberArea;
 
 
    public class Character
@@ -14,10 +15,9 @@ using System.Threading.Tasks;
 
        //the character's ID number, this can be 1-10
        public int characterID;
-       public int turnPriority;
-
+       public int TeamID;
        //Health variables
-       int maxHealth;
+       public int maxHealth;
        public int HP;
 
        // Level Variables
@@ -25,7 +25,7 @@ using System.Threading.Tasks;
        public int XP = 0;
 
         //base health for each class, not growth. used for balance purposes.
-       int[] basehealth = new int[4] { 500, 250, 200, 250 };
+       int[] basehealth = new int[4] { 1000, 250, 200, 300 };
 
         //1)Paladin   2)Warrior  3)Rogue  4) Mage
         //add additional class by increasing array sizes, might put these into their own class later and make a list
@@ -36,9 +36,9 @@ using System.Threading.Tasks;
         int[] intelgrowth = new int[4]{5,2,6,19};
 
         //base values for critical strike, armour(damage reduction) and block, these are then altered slightly based on character level and on dexterity/intellect, stamina/strength and srength/dexterity stats repsectively
-        int[] critbase = new int[4] {1,5,40,10};
-        int[] blockbase = new int[4] { 22, 2, 2, 1 };
-        int[] armourbase = new int[4] { 20, 7, 5, 0 };
+        int[] critbase = new int[4] {1,5,40,7};
+        int[] blockbase = new int[4] { 10, 0, 1, 0 };
+        int[] armourbase = new int[4] { 18, 6, 2, 0 };
         
         //character stats
        public int str = 0;
@@ -76,8 +76,8 @@ using System.Threading.Tasks;
        {
            int number = r.Next(min, max);
            return number;
+           
        }
-       
 
        public string statBrief()
        {
@@ -86,6 +86,10 @@ using System.Threading.Tasks;
            if (defending == true)
            {
                brief = brief + " <DEFENDING>";
+           }
+           if (isDead)
+           {
+               brief = brief + " <DEAD>";
            }
            return brief; 
        }
@@ -98,7 +102,7 @@ using System.Threading.Tasks;
        {
            Console.WriteLine("    "+teamName);
            Console.WriteLine("----------------------------");
-           Console.WriteLine("ID# {0}   {1}",characterID,characterName);
+           Console.WriteLine("        {0}",characterName);
            Console.WriteLine("----------------------------");
            Console.WriteLine("      LVL {0} {1}     ",level,jobNames[Job]);
            Console.WriteLine("----------------------------");
@@ -213,11 +217,11 @@ using System.Threading.Tasks;
            int damage;
            if (Job == 3)
            {
-               damage = intel * 2;
+               damage = intel * 5;
            }
            else
            {
-               damage = str * 4;
+               damage = str * 7;
            }
            if (defended)
            {
@@ -239,6 +243,14 @@ using System.Threading.Tasks;
            {
                HP = 0;
                System.Threading.Thread.Sleep(500);
+               defending = false;
+               defendingOther = false;
+               defended = false;
+               Program.Teams[TeamID][defender].defending = false;
+               Program.Teams[TeamID][defender].defendingOther = false;
+               
+               
+
                Console.Write(characterName + " HAS BEEN DESTROYED!");
                Console.WriteLine();
                isDead = true;
@@ -250,7 +262,7 @@ using System.Threading.Tasks;
        {
            bool dodge= false;
            int hitchance = rng(1, 100);
-           int dodgechance = rng(1, 10) + (dex / level);
+           int dodgechance = rng(1, 5) + (dex /( 6*level));
            if (dodgechance > 75)
            {
                dodgechance = 75;
